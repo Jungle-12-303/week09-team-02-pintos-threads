@@ -28,7 +28,7 @@ RUN echo "jungle ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/jungle
 USER jungle
 WORKDIR /home/jungle
 
-RUN echo "source /workspaces/pintos/activate" >> /home/jungle/.bashrc
+RUN printf '\n# Add Pintos utility commands to PATH for interactive shells.\nif [ -f /workspaces/pintos/activate ]; then\n    source /workspaces/pintos/activate\nfi\n' >> /home/jungle/.bashrc
 
 # Clone the repository
 # RUN git clone https://github.com/casys-kaist/pintos-kaist /home/jungle/pintos
