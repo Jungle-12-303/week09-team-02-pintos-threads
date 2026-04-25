@@ -224,6 +224,14 @@ thread_block (void) {
 	schedule ();
 }
 
+struct thread *selected_thread_block (struct thread *t) {
+	ASSERT (!intr_context ());
+	ASSERT (intr_get_level () == INTR_OFF);
+	t->status = THREAD_BLOCKED;
+	schedule ();
+	return t;
+}
+
 /* Transitions a blocked thread T to the ready-to-run state.
    This is an error if T is not blocked.  (Use thread_yield() to
    make the running thread ready.)
