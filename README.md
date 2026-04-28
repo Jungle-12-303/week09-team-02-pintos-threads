@@ -75,15 +75,52 @@ Pintos 스레드는 `THREAD_RUNNING`, `THREAD_READY`, `THREAD_BLOCKED`, `THREAD_
 
 ## 상태를 바꾸는 주요 함수
 
-| 함수 | 상태 변화 | 함수 내용 |
-| --- | --- | --- |
-| `thread_create()` | `=> BLOCKED -> READY` | `palloc_get_page()`로 스레드 구조체를 만들고, `init_thread()`로 기본 상태를 `THREAD_BLOCKED`로 초기화합니다. 그 뒤 처음 실행할 함수 정보를 `intr_frame`에 세팅하고 `thread_unblock()`으로 `ready_list`에 넣습니다. |
-| `thread_unblock(t)` | `=> BLOCKED -> READY` | blocked 상태의 스레드 `t`를 실행 가능한 상태로 바꾸고 `ready_list`에 넣습니다. 이때부터 스케줄링 대상이 됩니다. |
-| `thread_block()` | `=> RUNNING -> BLOCKED` | 현재 실행 중인 스레드를 blocked 상태로 바꾸고 `schedule()`을 호출해서 다른 스레드에게 CPU를 넘깁니다. |
-| `thread_yield()` | `=> RUNNING -> READY` | 현재 스레드가 CPU를 자발적으로 양보합니다. idle 스레드가 아니라면 현재 스레드를 다시 `ready_list`에 넣고 `do_schedule(THREAD_READY)`를 호출합니다. |
-| `thread_exit()` | `=> RUNNING -> DYING` | 현재 스레드를 종료 상태로 만들고 다시는 돌아오지 않습니다. 내부에서 `do_schedule(THREAD_DYING)`을 호출합니다. |
-| `do_schedule(status)` | `=> RUNNING -> status` | 현재 스레드의 상태를 인자로 받은 `status`로 바꾼 뒤 `schedule()`을 호출합니다. |
-| `schedule()` | `=> READY -> RUNNING` | `next_thread_to_run()`으로 `ready_list`에서 다음 스레드를 고르고, 그 스레드의 상태를 `THREAD_RUNNING`으로 바꾼 뒤 실제 context switch를 진행합니다. |
+<table>
+  <thead>
+    <tr>
+      <th>함수</th>
+      <th style="min-width: 180px;">상태 변화</th>
+      <th>함수 내용</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>thread_create()</code></td>
+      <td><code style="white-space: nowrap;">=> BLOCKED -> READY</code></td>
+      <td><code>palloc_get_page()</code>로 스레드 구조체를 만들고, <code>init_thread()</code>로 기본 상태를 <code>THREAD_BLOCKED</code>로 초기화합니다. 그 뒤 처음 실행할 함수 정보를 <code>intr_frame</code>에 세팅하고 <code>thread_unblock()</code>으로 <code>ready_list</code>에 넣습니다.</td>
+    </tr>
+    <tr>
+      <td><code>thread_unblock(t)</code></td>
+      <td><code style="white-space: nowrap;">=> BLOCKED -> READY</code></td>
+      <td>blocked 상태의 스레드 <code>t</code>를 실행 가능한 상태로 바꾸고 <code>ready_list</code>에 넣습니다. 이때부터 스케줄링 대상이 됩니다.</td>
+    </tr>
+    <tr>
+      <td><code>thread_block()</code></td>
+      <td><code style="white-space: nowrap;">=> RUNNING -> BLOCKED</code></td>
+      <td>현재 실행 중인 스레드를 blocked 상태로 바꾸고 <code>schedule()</code>을 호출해서 다른 스레드에게 CPU를 넘깁니다.</td>
+    </tr>
+    <tr>
+      <td><code>thread_yield()</code></td>
+      <td><code style="white-space: nowrap;">=> RUNNING -> READY</code></td>
+      <td>현재 스레드가 CPU를 자발적으로 양보합니다. idle 스레드가 아니라면 현재 스레드를 다시 <code>ready_list</code>에 넣고 <code>do_schedule(THREAD_READY)</code>를 호출합니다.</td>
+    </tr>
+    <tr>
+      <td><code>thread_exit()</code></td>
+      <td><code style="white-space: nowrap;">=> RUNNING -> DYING</code></td>
+      <td>현재 스레드를 종료 상태로 만들고 다시는 돌아오지 않습니다. 내부에서 <code>do_schedule(THREAD_DYING)</code>을 호출합니다.</td>
+    </tr>
+    <tr>
+      <td><code>do_schedule(status)</code></td>
+      <td><code style="white-space: nowrap;">=> RUNNING -> status</code></td>
+      <td>현재 스레드의 상태를 인자로 받은 <code>status</code>로 바꾼 뒤 <code>schedule()</code>을 호출합니다.</td>
+    </tr>
+    <tr>
+      <td><code>schedule()</code></td>
+      <td><code style="white-space: nowrap;">=> READY -> RUNNING</code></td>
+      <td><code>next_thread_to_run()</code>으로 <code>ready_list</code>에서 다음 스레드를 고르고, 그 스레드의 상태를 <code>THREAD_RUNNING</code>으로 바꾼 뒤 실제 context switch를 진행합니다.</td>
+    </tr>
+  </tbody>
+</table>
 
 ## 핵심 흐름
 
