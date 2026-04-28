@@ -77,13 +77,13 @@ Pintos 스레드는 `THREAD_RUNNING`, `THREAD_READY`, `THREAD_BLOCKED`, `THREAD_
 
 | 함수 | 상태 변화 | 함수 내용 |
 | --- | --- | --- |
-| `thread_create()` | 새 스레드 생성 후 `BLOCKED -> READY` | `palloc_get_page()`로 스레드 구조체를 만들고, `init_thread()`로 기본 상태를 `THREAD_BLOCKED`로 초기화합니다. 그 뒤 처음 실행할 함수 정보를 `intr_frame`에 세팅하고 `thread_unblock()`으로 `ready_list`에 넣습니다. |
-| `thread_unblock(t)` | `BLOCKED -> READY` | blocked 상태의 스레드 `t`를 실행 가능한 상태로 바꾸고 `ready_list`에 넣습니다. 이때부터 스케줄링 대상이 됩니다. |
-| `thread_block()` | `RUNNING -> BLOCKED` | 현재 실행 중인 스레드를 blocked 상태로 바꾸고 `schedule()`을 호출해서 다른 스레드에게 CPU를 넘깁니다. |
-| `thread_yield()` | `RUNNING -> READY` | 현재 스레드가 CPU를 자발적으로 양보합니다. idle 스레드가 아니라면 현재 스레드를 다시 `ready_list`에 넣고 `do_schedule(THREAD_READY)`를 호출합니다. |
-| `thread_exit()` | `RUNNING -> DYING` | 현재 스레드를 종료 상태로 만들고 다시는 돌아오지 않습니다. 내부에서 `do_schedule(THREAD_DYING)`을 호출합니다. |
-| `do_schedule(status)` | `RUNNING -> status` | 현재 스레드의 상태를 인자로 받은 `status`로 바꾼 뒤 `schedule()`을 호출합니다. |
-| `schedule()` | 다음 스레드 `READY -> RUNNING` | `next_thread_to_run()`으로 `ready_list`에서 다음 스레드를 고르고, 그 스레드의 상태를 `THREAD_RUNNING`으로 바꾼 뒤 실제 context switch를 진행합니다. |
+| `thread_create()` | `=> BLOCKED -> READY` | `palloc_get_page()`로 스레드 구조체를 만들고, `init_thread()`로 기본 상태를 `THREAD_BLOCKED`로 초기화합니다. 그 뒤 처음 실행할 함수 정보를 `intr_frame`에 세팅하고 `thread_unblock()`으로 `ready_list`에 넣습니다. |
+| `thread_unblock(t)` | `=> BLOCKED -> READY` | blocked 상태의 스레드 `t`를 실행 가능한 상태로 바꾸고 `ready_list`에 넣습니다. 이때부터 스케줄링 대상이 됩니다. |
+| `thread_block()` | `=> RUNNING -> BLOCKED` | 현재 실행 중인 스레드를 blocked 상태로 바꾸고 `schedule()`을 호출해서 다른 스레드에게 CPU를 넘깁니다. |
+| `thread_yield()` | `=> RUNNING -> READY` | 현재 스레드가 CPU를 자발적으로 양보합니다. idle 스레드가 아니라면 현재 스레드를 다시 `ready_list`에 넣고 `do_schedule(THREAD_READY)`를 호출합니다. |
+| `thread_exit()` | `=> RUNNING -> DYING` | 현재 스레드를 종료 상태로 만들고 다시는 돌아오지 않습니다. 내부에서 `do_schedule(THREAD_DYING)`을 호출합니다. |
+| `do_schedule(status)` | `=> RUNNING -> status` | 현재 스레드의 상태를 인자로 받은 `status`로 바꾼 뒤 `schedule()`을 호출합니다. |
+| `schedule()` | `=> READY -> RUNNING` | `next_thread_to_run()`으로 `ready_list`에서 다음 스레드를 고르고, 그 스레드의 상태를 `THREAD_RUNNING`으로 바꾼 뒤 실제 context switch를 진행합니다. |
 
 ## 핵심 흐름
 
