@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="880" viewBox="0 0 1240 880" role="img" aria-labelledby="title desc">
+  <title id="title">Pintos Thread Lifecycle Flow</title>
+  <desc id="desc">Readable thread lifecycle diagram showing thread states on the left and state changing functions on the right.</desc>
+  <defs>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrow-emerald" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#059669"/>
+    </marker>
+    <marker id="arrow-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#d97706"/>
+    </marker>
+    <marker id="arrow-violet" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7c3aed"/>
+    </marker>
+    <marker id="arrow-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#e11d48"/>
+    </marker>
+    <style>
+      .bg { fill: #f8fafc; }
+      .title { font: 700 34px Arial, sans-serif; fill: #111827; }
+      .subtitle { font: 400 17px Arial, sans-serif; fill: #475569; }
+      .section { font: 700 18px Arial, sans-serif; fill: #334155; }
+      .state-title { font: 700 24px Arial, sans-serif; fill: #111827; }
+      .state-sub { font: 400 15px Arial, sans-serif; fill: #475569; }
+      .fn-title { font: 700 17px Arial, sans-serif; fill: #111827; }
+      .fn-code { font: 700 14px "DejaVu Sans Mono", Consolas, monospace; fill: #1e293b; }
+      .fn-text { font: 400 14px Arial, sans-serif; fill: #475569; }
+      .note { font: 400 14px Arial, sans-serif; fill: #334155; }
+      .state { stroke: #94a3b8; stroke-width: 2.5; rx: 18; ry: 18; }
+      .fn { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; rx: 14; ry: 14; }
+      .ready { fill: #dcfce7; }
+      .running { fill: #dbeafe; }
+      .blocked { fill: #fef3c7; }
+      .dying { fill: #ffe4e6; }
+      .to-running { fill: none; stroke: #2563eb; stroke-width: 3; marker-end: url(#arrow-blue); }
+      .to-ready { fill: none; stroke: #059669; stroke-width: 3; marker-end: url(#arrow-emerald); }
+      .to-blocked { fill: none; stroke: #d97706; stroke-width: 3; marker-end: url(#arrow-amber); }
+      .to-ready-from-blocked { fill: none; stroke: #7c3aed; stroke-width: 3; marker-end: url(#arrow-violet); }
+      .to-dying { fill: none; stroke: #e11d48; stroke-width: 3; marker-end: url(#arrow-rose); }
+      .divider { stroke: #cbd5e1; stroke-width: 2; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1240" height="880"/>
+
+  <text class="title" x="56" y="58">Pintos Thread Lifecycle</text>
+  <text class="subtitle" x="56" y="88">왼쪽은 상태, 오른쪽은 상태를 바꾸는 함수입니다. 선은 상태 박스끼리만 연결해서 읽기 쉽게 분리했습니다.</text>
+
+  <text class="section" x="80" y="136">Thread states</text>
+  <text class="section" x="760" y="136">Functions that change state</text>
+  <line class="divider" x1="690" y1="124" x2="690" y2="806"/>
+
+  <rect class="state ready" x="92" y="168" width="300" height="112"/>
+  <text class="state-title" x="126" y="212">THREAD_READY</text>
+  <text class="state-sub" x="126" y="242">ready_list에서 CPU 차례를 기다림</text>
+  <text class="state-sub" x="126" y="264">실행 가능하지만 실행 중은 아님</text>
+
+  <rect class="state running" x="92" y="360" width="300" height="112"/>
+  <text class="state-title" x="126" y="404">THREAD_RUNNING</text>
+  <text class="state-sub" x="126" y="434">현재 CPU에서 실행 중</text>
+  <text class="state-sub" x="126" y="456">thread_current()가 가리키는 스레드</text>
+
+  <rect class="state blocked" x="92" y="552" width="300" height="112"/>
+  <text class="state-title" x="126" y="596">THREAD_BLOCKED</text>
+  <text class="state-sub" x="126" y="626">sleep, lock, semaphore 등을 기다림</text>
+  <text class="state-sub" x="126" y="648">ready_list에 없어서 실행 불가</text>
+
+  <rect class="state dying" x="92" y="720" width="300" height="96"/>
+  <text class="state-title" x="126" y="762">THREAD_DYING</text>
+  <text class="state-sub" x="126" y="792">종료 중, 이후 메모리 정리 대상</text>
+
+  <path class="to-running" d="M 392 224 H 506 V 360 H 402"/>
+  <text class="fn-code" x="430" y="210" fill="#2563eb">schedule()</text>
+  <text class="fn-text" x="430" y="232">READY -> RUNNING</text>
+
+  <path class="to-ready" d="M 392 416 H 558 V 280 H 402"/>
+  <text class="fn-code" x="438" y="400" fill="#059669">thread_yield()</text>
+  <text class="fn-text" x="438" y="422">RUNNING -> READY</text>
+
+  <path class="to-blocked" d="M 392 444 H 548 V 552 H 402"/>
+  <text class="fn-code" x="430" y="514" fill="#d97706">thread_block()</text>
+  <text class="fn-text" x="430" y="536">RUNNING -> BLOCKED</text>
+
+  <path class="to-ready-from-blocked" d="M 392 608 H 600 V 280 H 402"/>
+  <text class="fn-code" x="430" y="594" fill="#7c3aed">thread_unblock(t)</text>
+  <text class="fn-text" x="430" y="616">BLOCKED -> READY</text>
+
+  <path class="to-dying" d="M 242 472 V 710"/>
+  <text class="fn-code" x="282" y="694" fill="#e11d48">thread_exit()</text>
+  <text class="fn-text" x="282" y="716">RUNNING -> DYING</text>
+
+  <rect class="fn" x="748" y="168" width="390" height="120"/>
+  <text class="fn-title" x="776" y="204">thread_create()</text>
+  <text class="fn-code" x="776" y="232">init_thread(): status = BLOCKED</text>
+  <text class="fn-code" x="776" y="258">thread_unblock(): status = READY</text>
+  <text class="fn-text" x="776" y="280">새 스레드를 만들고 실행 대기열에 올립니다.</text>
+
+  <rect class="fn" x="748" y="316" width="390" height="104"/>
+  <text class="fn-title" x="776" y="352">thread_unblock(t)</text>
+  <text class="fn-code" x="776" y="380">t->status = THREAD_READY</text>
+  <text class="fn-text" x="776" y="402">BLOCKED 스레드를 ready_list에 넣습니다.</text>
+
+  <rect class="fn" x="748" y="448" width="390" height="104"/>
+  <text class="fn-title" x="776" y="484">thread_block()</text>
+  <text class="fn-code" x="776" y="512">current->status = THREAD_BLOCKED</text>
+  <text class="fn-text" x="776" y="534">현재 스레드를 재우고 schedule()로 넘깁니다.</text>
+
+  <rect class="fn" x="748" y="580" width="390" height="104"/>
+  <text class="fn-title" x="776" y="616">thread_yield()</text>
+  <text class="fn-code" x="776" y="644">do_schedule(THREAD_READY)</text>
+  <text class="fn-text" x="776" y="666">현재 스레드가 CPU를 양보합니다.</text>
+
+  <rect class="fn" x="748" y="712" width="390" height="104"/>
+  <text class="fn-title" x="776" y="748">thread_exit() / do_schedule()</text>
+  <text class="fn-code" x="776" y="776">status = THREAD_DYING or READY</text>
+  <text class="fn-text" x="776" y="798">상태를 바꾸고 schedule()을 호출합니다.</text>
+
+  <rect x="56" y="840" width="1128" height="2" fill="#cbd5e1"/>
+  <text class="note" x="56" y="866">핵심: BLOCKED는 스케줄러가 직접 실행하지 않습니다. thread_unblock()으로 READY가 된 뒤 schedule()이 선택해야 RUNNING이 됩니다.</text>
+</svg>
