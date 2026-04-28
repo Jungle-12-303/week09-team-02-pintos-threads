@@ -86,37 +86,37 @@ Pintos 스레드는 `THREAD_RUNNING`, `THREAD_READY`, `THREAD_BLOCKED`, `THREAD_
   <tbody>
     <tr>
       <td><code>thread_create()</code></td>
-      <td><code>=> BLOCKED->READY</code></td>
+      <td><code>BLOCKED->READY</code></td>
       <td><code>palloc_get_page()</code>로 스레드 구조체를 만들고, <code>init_thread()</code>로 기본 상태를 <code>THREAD_BLOCKED</code>로 초기화합니다. 그 뒤 처음 실행할 함수 정보를 <code>intr_frame</code>에 세팅하고 <code>thread_unblock()</code>으로 <code>ready_list</code>에 넣습니다.</td>
     </tr>
     <tr>
       <td><code>thread_unblock(t)</code></td>
-      <td><code>=> BLOCKED->READY</code></td>
+      <td><code>BLOCKED->READY</code></td>
       <td>blocked 상태의 스레드 <code>t</code>를 실행 가능한 상태로 바꾸고 <code>ready_list</code>에 넣습니다. 이때부터 스케줄링 대상이 됩니다.</td>
     </tr>
     <tr>
       <td><code>thread_block()</code></td>
-      <td><code>=> RUNNING->BLOCKED</code></td>
+      <td><code>RUNNING->BLOCKED</code></td>
       <td>현재 실행 중인 스레드를 blocked 상태로 바꾸고 <code>schedule()</code>을 호출해서 다른 스레드에게 CPU를 넘깁니다.</td>
     </tr>
     <tr>
       <td><code>thread_yield()</code></td>
-      <td><code>=> RUNNING->READY</code></td>
+      <td><code>RUNNING->READY</code></td>
       <td>현재 스레드가 CPU를 자발적으로 양보합니다. idle 스레드가 아니라면 현재 스레드를 다시 <code>ready_list</code>에 넣고 <code>do_schedule(THREAD_READY)</code>를 호출합니다.</td>
     </tr>
     <tr>
       <td><code>thread_exit()</code></td>
-      <td><code>=> RUNNING->DYING</code></td>
+      <td><code>RUNNING->DYING</code></td>
       <td>현재 스레드를 종료 상태로 만들고 다시는 돌아오지 않습니다. 내부에서 <code>do_schedule(THREAD_DYING)</code>을 호출합니다.</td>
     </tr>
     <tr>
       <td><code>do_schedule(status)</code></td>
-      <td><code>=> RUNNING->status</code></td>
+      <td><code>RUNNING->status</code></td>
       <td>현재 스레드의 상태를 인자로 받은 <code>status</code>로 바꾼 뒤 <code>schedule()</code>을 호출합니다.</td>
     </tr>
     <tr>
       <td><code>schedule()</code></td>
-      <td><code>=> READY->RUNNING</code></td>
+      <td><code>READY->RUNNING</code></td>
       <td><code>next_thread_to_run()</code>으로 <code>ready_list</code>에서 다음 스레드를 고르고, 그 스레드의 상태를 <code>THREAD_RUNNING</code>으로 바꾼 뒤 실제 context switch를 진행합니다.</td>
     </tr>
   </tbody>
