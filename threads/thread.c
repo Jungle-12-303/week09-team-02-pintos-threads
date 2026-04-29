@@ -10,6 +10,7 @@
 #include "threads/palloc.h"
 #include "threads/synch.h"
 #include "threads/vaddr.h"
+#include "kernel/list.h"
 #include "intrinsic.h"
 #ifdef USERPROG
 #include "userprog/process.h"
@@ -202,9 +203,9 @@ tid_t thread_create(const char *name, int priority,
 	t->tf.cs = SEL_KCSEG;
 	t->tf.eflags = FLAG_IF;
 
-	/* Add to run queue. */
 	thread_unblock(t);
-
+	/* t = new thread, current thread 와 비교 */
+	thread_preemption();
 	return tid;
 }
 
@@ -238,7 +239,10 @@ void thread_unblock(struct thread *t)
 
 	old_level = intr_disable();
 	ASSERT(t->status == THREAD_BLOCKED);
-	list_push_back(&ready_list, &t->elem);
+	/* 우선순위 삽입 후 정렬 */
+	bool sorted_type = DESCEND;
+	list_insert_ordered(&ready_list, &t->elem, comp_priority, &sorted_type);
+
 	t->status = THREAD_READY;
 	intr_set_level(old_level);
 }
@@ -303,7 +307,11 @@ void thread_yield(void)
 
 	old_level = intr_disable();
 	if (curr != idle_thread)
-		list_push_back(&ready_list, &curr->elem);
+	{
+		bool sorted_type = DESCEND;
+		list_insert_ordered(&ready_list, &curr->elem, comp_priority, &sorted_type);
+	}
+
 	do_schedule(THREAD_READY);
 	intr_set_level(old_level);
 }
@@ -312,6 +320,7 @@ void thread_yield(void)
 void thread_set_priority(int new_priority)
 {
 	thread_current()->priority = new_priority;
+	thread_yield();
 }
 
 /* Returns the current thread's priority. */
@@ -597,4 +606,26 @@ allocate_tid(void)
 	lock_release(&tid_lock);
 
 	return tid;
+}
+
+/* comp priority  ready list*/
+bool comp_priority(const struct list_elem *a, const struct list_elem *b, void *aux)
+{
+	const struct thread *ta = list_entry(a, struct thread, elem);
+	const struct thread *tb = list_entry(b, struct thread, elem);
+	bool is_ascend = *((bool *)aux);
+	if (is_ascend)
+		return ta->priority < tb->priority;
+	else
+		return ta->priority > tb->priority;
+}
+
+/* 현재 스레드와 ready list 가장 앞의 thread와 priority 비교 */
+void thread_preemption(void)
+{
+	if (list_empty(&ready_list))
+		return;
+	struct thread *front_th = list_entry(list_front(&ready_list), struct thread, elem);
+	if (thread_current()->priority < front_th->priority)
+		thread_yield();
 }

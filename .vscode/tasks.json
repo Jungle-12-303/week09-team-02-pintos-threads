@@ -1,0 +1,27 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Pintos: debug priority-change",
+      "type": "shell",
+      "command": "cd \"${workspaceFolder}/threads/build\" && (pintos --gdb -- -q run priority-change & pid=$!; sleep 1; echo PINTOS_GDB_READY; wait $pid)",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": {
+        "owner": "pintos",
+        "pattern": {
+          "regexp": "."
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".",
+          "endsPattern": "PINTOS_GDB_READY"
+        }
+      }
+    }
+  ]
+}

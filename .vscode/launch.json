@@ -1,0 +1,67 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Pintos Debug",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/threads/build/kernel.o",
+      "cwd": "${workspaceFolder}/threads",
+      "preLaunchTask": "Pintos: debug priority-change",
+      "miDebuggerPath": "/usr/bin/gdb",
+      "miDebuggerServerAddress": "localhost:1234",
+      "stopAtEntry": false,
+      "externalConsole": false,
+      "MIMode": "gdb"
+    },
+    {
+      "name": "[Week 9] Threads Debug",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/threads/build/kernel.o",
+      "cwd": "${workspaceFolder}/threads",
+      "preLaunchTask": "Pintos: debug priority-change",
+      "miDebuggerPath": "/usr/bin/gdb",
+      "miDebuggerServerAddress": "localhost:1234",
+      "stopAtEntry": false,
+      "externalConsole": false,
+      "MIMode": "gdb"
+    },
+    {
+      "name": "[Week 10-11] User Program Debug",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/userprog/build/kernel.o",
+      "cwd": "${workspaceFolder}/userprog",
+      "miDebuggerPath": "/usr/bin/gdb",
+      "miDebuggerServerAddress": "localhost:1234",
+      "stopAtEntry": false,
+      "externalConsole": false,
+      "MIMode": "gdb"
+    },
+    {
+      "name": "[Week 12-13] VM Debug",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/vm/build/kernel.o",
+      "cwd": "${workspaceFolder}/vm",
+      "miDebuggerPath": "/usr/bin/gdb",
+      "miDebuggerServerAddress": "localhost:1234",
+      "stopAtEntry": false,
+      "externalConsole": false,
+      "MIMode": "gdb"
+    },
+    {
+      "name": "Filesys Debug",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/filesys/build/kernel.o",
+      "cwd": "${workspaceFolder}/filesys",
+      "miDebuggerPath": "/usr/bin/gdb",
+      "miDebuggerServerAddress": "localhost:1234",
+      "stopAtEntry": false,
+      "externalConsole": false,
+      "MIMode": "gdb"
+    }
+  ]
+}

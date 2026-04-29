@@ -113,9 +113,7 @@ void timer_sleep(int64_t ticks)
 
 	thread_block();
 	intr_set_level(old_level);
-	// busy waiting 개선
-	// while (timer_elapsed (start) < ticks)
-	// 	thread_yield ();
+
 }
 
 /* Suspends execution for approximately MS milliseconds. */

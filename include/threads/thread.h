@@ -28,6 +28,10 @@ typedef int tid_t;
 #define PRI_DEFAULT 31 /* Default priority. */
 #define PRI_MAX 63	   /* Highest priority. */
 
+/* ready list waiters sorting */
+#define ASCEND true
+#define DESCEND false
+
 /* A kernel thread or user process.
  *
  * Each thread structure is stored in its own 4 kB page.  The
@@ -144,4 +148,9 @@ int thread_get_load_avg(void);
 
 void do_iret(struct intr_frame *tf);
 
+/* 현재 스레드와 ready list 가장 앞의 thread와 priority 비교 */
+void thread_preemption(void);
+
+/* priority 정렬 */
+bool comp_priority(const struct list_elem *a, const struct list_elem *b, void *aux);
 #endif /* threads/thread.h */
