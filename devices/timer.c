@@ -107,13 +107,15 @@ bool list_sort_by_wake_tick(const struct list_elem *a, const struct list_elem *b
 void
 timer_sleep (int64_t ticks) {
 	int64_t wake_up_t = timer_ticks() + ticks;
-	intr_disable();
+	enum intr_level old_level = intr_disable();
 	struct thread *t = thread_current();
 	t->wake_tick = wake_up_t;
 	list_push_front(&sleep_list, &t->elem);
 	list_sort(&sleep_list,list_sort_by_wake_tick,NULL);
-	t = selected_thread_block(t);
-	intr_enable();
+	thread_block();
+	// t = selected_thread_block(t);
+	// intr_enable();
+	intr_set_level(old_level);
 	// int64_t start = timer_ticks ();
 	
 

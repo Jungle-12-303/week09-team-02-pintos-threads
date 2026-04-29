@@ -16,9 +16,9 @@ test_priority_change (void)
   ASSERT (!thread_mlfqs);
 
   msg ("Creating a high-priority thread 2.");
-  thread_create ("thread 2", PRI_DEFAULT + 1, changing_thread, NULL);
+  thread_create ("thread 2", PRI_DEFAULT + 1, changing_thread, NULL); // 32
   msg ("Thread 2 should have just lowered its priority.");
-  thread_set_priority (PRI_DEFAULT - 2);
+  thread_set_priority (PRI_DEFAULT - 2); // 29
   msg ("Thread 2 should have just exited.");
 }
 

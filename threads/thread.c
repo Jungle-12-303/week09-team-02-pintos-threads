@@ -62,7 +62,7 @@ static void init_thread (struct thread *, const char *name, int priority);
 static void do_schedule(int status);
 static void schedule (void);
 static tid_t allocate_tid (void);
-
+bool comp_priority_function(const struct list_elem *a, const struct list_elem *b, void *aux);
 /* Returns true if T appears to point to a valid thread. */
 #define is_thread(t) ((t) != NULL && (t)->magic == THREAD_MAGIC)
 
@@ -92,6 +92,7 @@ static uint64_t gdt[3] = { 0, 0x00af9a000000ffff, 0x00cf92000000ffff };
 
    It is not safe to call thread_current() until this function
    finishes. */
+
 void
 thread_init (void) {
 	ASSERT (intr_get_level () == INTR_OFF);
@@ -192,7 +193,6 @@ thread_create (const char *name, int priority,
 	/* Initialize thread. */
 	init_thread (t, name, priority);
 	tid = t->tid = allocate_tid ();
-
 	/* Call the kernel_thread if it scheduled.
 	 * Note) rdi is 1st argument, and rsi is 2nd argument. */
 	t->tf.rip = (uintptr_t) kernel_thread;
@@ -206,7 +206,9 @@ thread_create (const char *name, int priority,
 
 	/* Add to run queue. */
 	thread_unblock (t);
-
+	if (thread_current()->priority < t->priority) {
+		thread_yield();
+	}
 	return tid;
 }
 
@@ -217,20 +219,20 @@ thread_create (const char *name, int priority,
    is usually a better idea to use one of the synchronization
    primitives in synch.h. */
 void
-thread_block (void) {
+thread_block (void) { // 현재 스레드 실행을 막고 다음 스레드 실행
 	ASSERT (!intr_context ());
 	ASSERT (intr_get_level () == INTR_OFF);
 	thread_current ()->status = THREAD_BLOCKED;
-	schedule ();
+	schedule (); // 다음걸 실행
 }
 
-struct thread *selected_thread_block (struct thread *t) {
-	ASSERT (!intr_context ());
-	ASSERT (intr_get_level () == INTR_OFF);
-	t->status = THREAD_BLOCKED;
-	schedule ();
-	return t;
-}
+// struct thread *selected_thread_block (struct thread *t) {
+// 	ASSERT (!intr_context ());
+// 	ASSERT (intr_get_level () == INTR_OFF);
+// 	t->status = THREAD_BLOCKED;
+// 	schedule ();
+// 	return t;
+// }
 
 /* Transitions a blocked thread T to the ready-to-run state.
    This is an error if T is not blocked.  (Use thread_yield() to
@@ -240,6 +242,8 @@ struct thread *selected_thread_block (struct thread *t) {
    be important: if the caller had disabled interrupts itself,
    it may expect that it can atomically unblock a thread and
    update other data. */
+
+
 void
 thread_unblock (struct thread *t) {
 	enum intr_level old_level;
@@ -247,11 +251,15 @@ thread_unblock (struct thread *t) {
 	ASSERT (is_thread (t));
 
 	old_level = intr_disable ();
+	
 	ASSERT (t->status == THREAD_BLOCKED);
-	list_push_back (&ready_list, &t->elem);
+	list_insert_ordered(&ready_list, &t->elem,comp_priority_function,NULL);
+	
+	// list_push_back (&ready_list, &t->elem);
 	t->status = THREAD_READY;
 	intr_set_level (old_level);
 }
+
 
 /* Returns the name of the running thread. */
 const char *
@@ -311,15 +319,36 @@ thread_yield (void) {
 
 	old_level = intr_disable ();
 	if (curr != idle_thread)
-		list_push_back (&ready_list, &curr->elem);
+		list_insert_ordered(&ready_list, &curr->elem,comp_priority_function,NULL);
+		// list_push_back (&ready_list, &curr->elem);
 	do_schedule (THREAD_READY);
 	intr_set_level (old_level);
+}
+
+bool comp_priority_function(const struct list_elem *a, const struct list_elem *b, void *aux) {
+	ASSERT (a != NULL);
+	ASSERT (b != NULL);
+
+	struct thread *a_thread = list_entry(a, struct thread, elem);
+	struct thread *b_thread = list_entry(b, struct thread, elem);
+	return a_thread->priority > b_thread->priority;
+}
+
+bool comp_conv_priority_function(const struct list_elem *a, const struct list_elem *b, void *aux) {
+	ASSERT (a != NULL);
+	ASSERT (b != NULL);
+
+	struct thread *a_thread = list_entry(a, struct thread, elem);
+	struct thread *b_thread = list_entry(b, struct thread, elem);
+	return a_thread->priority > b_thread->priority;
 }
 
 /* Sets the current thread's priority to NEW_PRIORITY. */
 void
 thread_set_priority (int new_priority) {
-	thread_current ()->priority = new_priority;
+	struct thread *current_thread = thread_current ();
+	current_thread->priority = new_priority;
+	thread_yield();
 }
 
 /* Returns the current thread's priority. */
@@ -544,6 +573,13 @@ do_schedule(int status) {
 	}
 	thread_current ()->status = status;
 	schedule ();
+}
+
+void preemption(struct thread *t, struct list list) {
+// 스레드가 실행중인 스레드보다 우선순위가 높다면 CPU를 가로채게 하는 것
+	if ((!list_empty(&ready_list)) && (t->priority > thread_current()->priority)) {
+		thread_yield();
+	}
 }
 
 static void
