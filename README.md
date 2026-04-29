@@ -139,3 +139,27 @@ BLOCKED 상태에서:
   -> thread_unblock()이 호출되어야 READY가 됨
   -> READY가 된 뒤에야 schedule()의 선택 대상이 됨
 ```
+
+---
+
+# Priority Scheduling Test Flow
+
+우선순위 스케줄링 테스트 7번과 14~17번은 `ready_list` 정렬, 선점, semaphore/condition variable 대기열의 wake-up 순서를 확인합니다. 아래 그림은 각 테스트가 어떤 흐름을 검증하는지 요약한 것입니다.
+
+![Priority scheduling tests flow](docs/priority-scheduling-tests-flow.svg)
+
+## 테스트별 검증 흐름
+
+| 번호 | 테스트 | 검증 내용 |
+| --- | --- | --- |
+| 7 | `priority-change` | 현재 스레드의 priority가 낮아졌을 때, ready 상태의 더 높은 priority 스레드에게 CPU를 양보하는지 확인합니다. |
+| 14 | `priority-fifo` | priority가 같은 스레드들이 먼저 ready 상태가 된 순서대로 실행되는지 확인합니다. |
+| 15 | `priority-preempt` | 현재 스레드보다 priority가 높은 스레드가 생성되면 즉시 선점되는지 확인합니다. |
+| 16 | `priority-sema` | `sema_down()`으로 잠든 스레드들 중 가장 높은 priority 스레드가 `sema_up()`에서 먼저 깨어나는지 확인합니다. |
+| 17 | `priority-condvar` | `cond_wait()`에서 기다리는 스레드들 중 가장 높은 priority 스레드가 `cond_signal()`에서 먼저 깨어나는지 확인합니다. |
+
+## 확인 명령
+
+```bash
+printf '7 14-17\n' | threads/select_test.sh -q
+```
