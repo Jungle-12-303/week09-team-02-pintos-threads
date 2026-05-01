@@ -52,10 +52,10 @@ main() 시작
 ### 1-1. `process_create_initd()`부터 본다
 
 파일:
-- [userprog/process.c](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/process.c:42)
+- [userprog/process.c](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/process.c#L42)
 
 줄 번호:
-- [`userprog/process.c:42`](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/process.c:42)
+- [`userprog/process.c:42`](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/process.c#L42)
 
 #### 1-1-1. 이 함수의 현재 역할
 
@@ -86,10 +86,10 @@ main() 시작
 ### 1-2. `initd()`를 본다
 
 파일:
-- [userprog/process.c](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/process.c:62)
+- [userprog/process.c](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/process.c#L62)
 
 줄 번호:
-- [`userprog/process.c:62`](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/process.c:62)
+- [`userprog/process.c:62`](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/process.c#L62)
 
 #### 1-2-1. 이 함수의 현재 역할
 
@@ -120,10 +120,10 @@ main() 시작
 ### 1-3. `process_exec()`를 본다
 
 파일:
-- [userprog/process.c](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/process.c:164)
+- [userprog/process.c](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/process.c#L164)
 
 줄 번호:
-- [`userprog/process.c:164`](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/process.c:164)
+- [`userprog/process.c:164`](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/process.c#L164)
 
 #### 1-3-1. 이 함수의 현재 역할
 
@@ -155,10 +155,10 @@ main() 시작
 ### 1-4. `process_activate()`를 본다
 
 파일:
-- [userprog/process.c](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/process.c:252)
+- [userprog/process.c](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/process.c#L252)
 
 줄 번호:
-- [`userprog/process.c:252`](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/process.c:252)
+- [`userprog/process.c:252`](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/process.c#L252)
 
 #### 1-4-1. 이 함수의 현재 역할
 
@@ -256,10 +256,10 @@ putbuf(buffer, size)
 ### 2-1. `printf`가 어디로 가는지 먼저 본다
 
 파일:
-- [lib/user/console.c](vscode://file/workspaces/week09-team-02-pintos-threads/lib/user/console.c:30)
+- [lib/user/console.c](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/lib/user/console.c#L30)
 
 줄 번호:
-- [`lib/user/console.c:30`](vscode://file/workspaces/week09-team-02-pintos-threads/lib/user/console.c:30)
+- [`lib/user/console.c:30`](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/lib/user/console.c#L30)
 
 #### 2-1-1. 이 함수의 현재 역할
 
@@ -289,16 +289,16 @@ putbuf(buffer, size)
 ### 2-2. `write()`가 어떻게 syscall로 바뀌는지 본다
 
 파일:
-- [lib/user/syscall.c](vscode://file/workspaces/week09-team-02-pintos-threads/lib/user/syscall.c:123)
+- [lib/user/syscall.c](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/lib/user/syscall.c#L123)
 
 줄 번호:
-- [`lib/user/syscall.c:123`](vscode://file/workspaces/week09-team-02-pintos-threads/lib/user/syscall.c:123)
+- [`lib/user/syscall.c:123`](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/lib/user/syscall.c#L123)
 
 같이 볼 위치:
-- [lib/user/syscall.c](vscode://file/workspaces/week09-team-02-pintos-threads/lib/user/syscall.c:6)
+- [lib/user/syscall.c](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/lib/user/syscall.c#L6)
 
 줄 번호:
-- [`lib/user/syscall.c:6`](vscode://file/workspaces/week09-team-02-pintos-threads/lib/user/syscall.c:6)
+- [`lib/user/syscall.c:6`](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/lib/user/syscall.c#L6)
 
 #### 2-2-1. 이 함수의 현재 역할
 
@@ -329,10 +329,10 @@ putbuf(buffer, size)
 ### 2-3. `SYS_WRITE` 번호표를 확인한다
 
 파일:
-- [include/lib/syscall-nr.h](vscode://file/workspaces/week09-team-02-pintos-threads/include/lib/syscall-nr.h:17)
+- [include/lib/syscall-nr.h](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/include/lib/syscall-nr.h#L17)
 
 줄 번호:
-- [`include/lib/syscall-nr.h:17`](vscode://file/workspaces/week09-team-02-pintos-threads/include/lib/syscall-nr.h:17)
+- [`include/lib/syscall-nr.h:17`](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/include/lib/syscall-nr.h#L17)
 
 #### 2-3-1. 이 파일의 현재 역할
 
@@ -363,10 +363,10 @@ putbuf(buffer, size)
 ### 2-4. `syscall_handler()`를 실제로 수정한다
 
 파일:
-- [userprog/syscall.c](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/syscall.c:42)
+- [userprog/syscall.c](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/syscall.c#L42)
 
 줄 번호:
-- [`userprog/syscall.c:42`](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/syscall.c:42)
+- [`userprog/syscall.c:42`](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/syscall.c#L42)
 
 #### 2-4-1. 이 함수의 현재 역할
 
@@ -402,10 +402,10 @@ putbuf(buffer, size)
 ### 2-5. 실제 출력이 끝나는 곳을 본다
 
 파일:
-- [lib/kernel/console.c](vscode://file/workspaces/week09-team-02-pintos-threads/lib/kernel/console.c:143)
+- [lib/kernel/console.c](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/lib/kernel/console.c#L143)
 
 줄 번호:
-- [`lib/kernel/console.c:143`](vscode://file/workspaces/week09-team-02-pintos-threads/lib/kernel/console.c:143)
+- [`lib/kernel/console.c:143`](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/lib/kernel/console.c#L143)
 
 #### 2-5-1. 이 함수의 현재 역할
 
@@ -472,10 +472,10 @@ main(argc, argv)
 ### 3-1. `process_exec()`를 다시 본다
 
 파일:
-- [userprog/process.c](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/process.c:164)
+- [userprog/process.c](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/process.c#L164)
 
 줄 번호:
-- [`userprog/process.c:164`](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/process.c:164)
+- [`userprog/process.c:164`](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/process.c#L164)
 
 #### 3-1-1. 이 함수의 현재 역할
 
@@ -505,7 +505,7 @@ main(argc, argv)
 ### 3-2. `load()`를 중심으로 수정한다
 
 파일:
-- [userprog/process.c](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/process.c)
+- [userprog/process.c](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/process.c)
 
 줄 번호:
 - `userprog/process.c` 안의 `load()` 정의 부분
@@ -547,7 +547,7 @@ main(argc, argv)
 ### 3-3. `setup_stack()`을 본다
 
 파일:
-- [userprog/process.c](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/process.c)
+- [userprog/process.c](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/process.c)
 
 줄 번호:
 - `userprog/process.c` 안의 `setup_stack()` 정의 부분
@@ -613,10 +613,10 @@ syscall_handler()
 ### 4-1. `syscall_handler()`를 확장한다
 
 파일:
-- [userprog/syscall.c](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/syscall.c:42)
+- [userprog/syscall.c](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/syscall.c#L42)
 
 줄 번호:
-- [`userprog/syscall.c:42`](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/syscall.c:42)
+- [`userprog/syscall.c:42`](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/syscall.c#L42)
 
 #### 4-1-1. 이 함수의 현재 역할
 
@@ -666,7 +666,7 @@ exit
 ### 4-2. `thread.h`에 fd table 필드를 추가한다
 
 파일:
-- [include/threads/thread.h](vscode://file/workspaces/week09-team-02-pintos-threads/include/threads/thread.h)
+- [include/threads/thread.h](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/include/threads/thread.h)
 
 줄 번호:
 - `include/threads/thread.h`
@@ -703,10 +703,10 @@ exit
 ### 4-3. `open/read/write/close` 로직을 붙인다
 
 파일:
-- [userprog/syscall.c](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/syscall.c:42)
+- [userprog/syscall.c](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/syscall.c#L42)
 
 줄 번호:
-- [`userprog/syscall.c:42`](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/syscall.c:42)
+- [`userprog/syscall.c:42`](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/syscall.c#L42)
 
 #### 4-3-1. 이 함수의 현재 역할
 
@@ -778,10 +778,10 @@ page_fault() / kill()
 ### 5-1. `syscall_handler()`에 포인터 검증을 붙인다
 
 파일:
-- [userprog/syscall.c](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/syscall.c:42)
+- [userprog/syscall.c](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/syscall.c#L42)
 
 줄 번호:
-- [`userprog/syscall.c:42`](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/syscall.c:42)
+- [`userprog/syscall.c:42`](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/syscall.c#L42)
 
 #### 5-1-1. 이 함수의 현재 역할
 
@@ -814,10 +814,10 @@ page_fault() / kill()
 ### 5-2. helper 함수를 만든다
 
 파일:
-- [userprog/syscall.c](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/syscall.c:42)
+- [userprog/syscall.c](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/syscall.c#L42)
 
 줄 번호:
-- [`userprog/syscall.c:42`](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/syscall.c:42) 근처에 추가
+- [`userprog/syscall.c:42`](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/syscall.c#L42) 근처에 추가
 
 #### 5-2-1. 이 함수들의 현재 역할
 
@@ -852,10 +852,10 @@ page_fault() / kill()
 ### 5-3. `page_fault()`를 본다
 
 파일:
-- [userprog/exception.c](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/exception.c:120)
+- [userprog/exception.c](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/exception.c#L120)
 
 줄 번호:
-- [`userprog/exception.c:120`](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/exception.c:120)
+- [`userprog/exception.c:120`](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/exception.c#L120)
 
 #### 5-3-1. 이 함수의 현재 역할
 
@@ -884,10 +884,10 @@ page_fault() / kill()
 ### 5-4. `kill()`을 본다
 
 파일:
-- [userprog/exception.c](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/exception.c:71)
+- [userprog/exception.c](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/exception.c#L71)
 
 줄 번호:
-- [`userprog/exception.c:71`](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/exception.c:71)
+- [`userprog/exception.c:71`](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/exception.c#L71)
 
 #### 5-4-1. 이 함수의 현재 역할
 
@@ -938,10 +938,10 @@ page_fault() / kill()
 ### 6-1. `process_wait()`를 구현한다
 
 파일:
-- [userprog/process.c](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/process.c:203)
+- [userprog/process.c](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/process.c#L203)
 
 줄 번호:
-- [`userprog/process.c:203`](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/process.c:203)
+- [`userprog/process.c:203`](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/process.c#L203)
 
 #### 6-1-1. 이 함수의 현재 역할
 
@@ -972,12 +972,12 @@ page_fault() / kill()
 ### 6-2. `process_fork()` / `__do_fork()`를 구현한다
 
 파일:
-- [userprog/process.c](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/process.c:77)
-- [userprog/process.c](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/process.c:120)
+- [userprog/process.c](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/process.c#L77)
+- [userprog/process.c](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/process.c#L120)
 
 줄 번호:
-- [`userprog/process.c:77`](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/process.c:77)
-- [`userprog/process.c:120`](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/process.c:120)
+- [`userprog/process.c:77`](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/process.c#L77)
+- [`userprog/process.c:120`](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/process.c#L120)
 
 #### 6-2-1. 이 함수들의 현재 역할
 
@@ -1009,12 +1009,12 @@ page_fault() / kill()
 ### 6-3. `exec()` / `process_exec()`를 다시 완성한다
 
 파일:
-- [userprog/process.c](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/process.c:164)
-- [userprog/syscall.c](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/syscall.c:42)
+- [userprog/process.c](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/process.c#L164)
+- [userprog/syscall.c](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/syscall.c#L42)
 
 줄 번호:
-- [`userprog/process.c:164`](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/process.c:164)
-- [`userprog/syscall.c:42`](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/syscall.c:42)
+- [`userprog/process.c:164`](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/process.c#L164)
+- [`userprog/syscall.c:42`](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/syscall.c#L42)
 
 #### 6-3-1. 이 함수들의 현재 역할
 
@@ -1046,7 +1046,7 @@ page_fault() / kill()
 ### 6-4. 실행 파일 write deny를 붙인다
 
 파일:
-- [userprog/process.c](vscode://file/workspaces/week09-team-02-pintos-threads/userprog/process.c)
+- [userprog/process.c](https://github.com/Jungle-12-303/week09-team-02-pintos-threads/blob/main/userprog/process.c)
 
 줄 번호:
 - `userprog/process.c` 안의 실행 파일 open / close 흐름
