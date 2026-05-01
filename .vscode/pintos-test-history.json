@@ -1,0 +1,69 @@
+{
+  "threads": {
+    "tests/threads/priority-change": {
+      "count": 4,
+      "last_used": 1777474785.702,
+      "last_action": "run"
+    },
+    "tests/threads/priority-donate-one": {
+      "count": 1,
+      "last_used": 1777385261.644,
+      "last_action": "run"
+    },
+    "tests/threads/priority-fifo": {
+      "count": 3,
+      "last_used": 1777474785.702,
+      "last_action": "run"
+    },
+    "tests/threads/priority-preempt": {
+      "count": 7,
+      "last_used": 1777474785.702,
+      "last_action": "run"
+    },
+    "tests/threads/alarm-single": {
+      "count": 3,
+      "last_used": 1777475666.574,
+      "last_action": "run"
+    },
+    "tests/threads/alarm-multiple": {
+      "count": 5,
+      "last_used": 1777475666.574,
+      "last_action": "run"
+    },
+    "tests/threads/alarm-simultaneous": {
+      "count": 4,
+      "last_used": 1777475666.574,
+      "last_action": "run"
+    },
+    "tests/threads/alarm-priority": {
+      "count": 5,
+      "last_used": 1777602612.793,
+      "last_action": "run"
+    },
+    "tests/threads/alarm-zero": {
+      "count": 4,
+      "last_used": 1777475666.574,
+      "last_action": "run"
+    },
+    "tests/threads/alarm-negative": {
+      "count": 4,
+      "last_used": 1777475666.574,
+      "last_action": "run"
+    },
+    "tests/threads/priority-donate-sema": {
+      "count": 2,
+      "last_used": 1777468288.043,
+      "last_action": "run"
+    },
+    "tests/threads/priority-sema": {
+      "count": 8,
+      "last_used": 1777474740.485,
+      "last_action": "run"
+    },
+    "tests/threads/priority-condvar": {
+      "count": 1,
+      "last_used": 1777611218.522,
+      "last_action": "run"
+    }
+  }
+}

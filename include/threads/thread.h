@@ -91,10 +91,13 @@ struct thread {
 	enum thread_status status;          /* Thread state. */
 	char name[16];                      /* Name (for debugging purposes). */
 	int priority;                       /* Priority. */
-
+	int init_priority;                  /* Priority without donation. */
+	struct lock *wait_on_lock;          /* Lock this thread is waiting on. */
+	struct list locks;                  /* Locks held by this thread. */
+	
 	/* Shared between thread.c and synch.c. */
 	struct list_elem elem;              /* List element. */
-
+	int64_t wake_up_tick;
 #ifdef USERPROG
 	/* Owned by userprog/process.c. */
 	uint64_t *pml4;                     /* Page map level 4 */

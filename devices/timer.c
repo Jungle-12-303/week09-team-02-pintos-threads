@@ -19,7 +19,7 @@
 
 /* Number of timer ticks since OS booted. */
 static int64_t ticks;
-
+static struct list sleeping_list;
 /* Number of loops per timer tick.
    Initialized by timer_calibrate(). */
 static unsigned loops_per_tick;
@@ -34,6 +34,8 @@ static void real_time_sleep (int64_t num, int32_t denom);
    corresponding interrupt. */
 void
 timer_init (void) {
+	list_init (&sleeping_list);
+
 	/* 8254 input frequency divided by TIMER_FREQ, rounded to
 	   nearest. */
 	uint16_t count = (1193180 + TIMER_FREQ / 2) / TIMER_FREQ;
@@ -87,15 +89,46 @@ timer_elapsed (int64_t then) {
 	return timer_ticks () - then;
 }
 
+bool less_wake_up_tick (const struct list_elem *a_,
+                             const struct list_elem *b_,
+                             void *aux) {
+	// if((bool *)aux) {
+	// 	const struct thread *a = list_entry (a_, struct thread, elem);
+	// 	const struct thread *b = list_entry (b_, struct thread, elem);
+	// 	return a->priority > b->priority;
+	// }
+	const struct thread *a = list_entry (a_, struct thread, elem);
+	const struct thread *b = list_entry (b_, struct thread, elem);
+	return a->wake_up_tick < b->wake_up_tick;
+}
+
 /* Suspends execution for approximately TICKS timer ticks. */
 void
-timer_sleep (int64_t ticks) {
-	int64_t start = timer_ticks ();
+timer_sleep (int64_t ticks){
+	if (ticks <= 0) return;
+		// 틱이 0 이하이면 아무것도 하지 않고 반환한다.
+	
+		enum intr_level old_level = intr_disable ();
+		
+		struct thread *cur = thread_current ();
+		cur->wake_up_tick = timer_ticks () + ticks;
+		// bool isDesc = false;
+		// list_insert_ordered	(&sleeping_list, &cur->elem, less_wake_up_tick, &isDesc);
+		list_insert_ordered	(&sleeping_list, &cur->elem, less_wake_up_tick, NULL);
+		
+		thread_block ();
+		// 현재 스레드의 wake_up_tick을 설정하고, 스레드를 블록한다.
+		intr_set_level (old_level);
+}						
+		
 
-	ASSERT (intr_get_level () == INTR_ON);
-	while (timer_elapsed (start) < ticks)
-		thread_yield ();
-}
+// {
+// 	int64_t start = timer_ticks ();
+
+// 	ASSERT (intr_get_level () == INTR_ON);
+// 	while (timer_elapsed (start) < ticks)
+// 		thread_yield ();
+// }
 
 /* Suspends execution for approximately MS milliseconds. */
 void
@@ -124,10 +157,18 @@ timer_print_stats (void) {
 /* Timer interrupt handler. */
 static void
 timer_interrupt (struct intr_frame *args UNUSED) {
-	ticks++;
-	thread_tick ();
+    ticks++;
+			struct list_elem *e = list_begin(&sleeping_list);
+			while (e != list_end(&sleeping_list)) {
+				struct thread *t = list_entry(e, struct thread, elem);
+				if (t -> wake_up_tick <= ticks) {
+				e = list_remove(e);
+				thread_unblock(t);
+			}
+			else{break;}
+		}
+thread_tick();
 }
-
 /* Returns true if LOOPS iterations waits for more than one timer
    tick, otherwise false. */
 static bool
