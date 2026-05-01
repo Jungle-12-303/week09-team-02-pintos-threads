@@ -34,6 +34,7 @@
                 "pkief.material-icon-theme",
                 "samuelcolvin.jinjahtml",
                 "tomoki1207.pdf",
+                "YoojinKoh.pintos-test-explorer",
                 "zhuangtongfa.material-theme"
             ],
             "settings": {
@@ -41,4 +42,6 @@
             }
         }
     }
+
+    
 }
