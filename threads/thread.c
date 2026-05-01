@@ -627,5 +627,12 @@ void thread_preemption(void)
 		return;
 	struct thread *front_th = list_entry(list_front(&ready_list), struct thread, elem);
 	if (thread_current()->priority < front_th->priority)
-		thread_yield();
+	{
+		// 인터럽트 핸들러 안에서 thread_yield() 호출 하면 안됨
+		if (intr_context())
+			// 인터럽트 처리가 끝나고 돌아갈때 yield 해줘
+			intr_yield_on_return();
+		else
+			thread_yield();
+	}
 }
