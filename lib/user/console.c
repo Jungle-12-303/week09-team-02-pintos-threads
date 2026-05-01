@@ -61,8 +61,6 @@ vhprintf (int handle, const char *format, va_list args) {
 	aux.p = aux.buf;
 	aux.char_cnt = 0;
 	aux.handle = handle;
-	__vprintf (format, args, add_char, &aux);
-	flush (&aux);
 	return aux.char_cnt;
 }
 

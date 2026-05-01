@@ -244,6 +244,7 @@ run_task (char **argv) {
 	if (thread_tests){
 		run_test (task);
 	} else {
+		vprintf("테스트",NULL);
 		process_wait (process_create_initd (task));
 	}
 #else
@@ -262,7 +263,6 @@ run_actions (char **argv) {
 		int argc;                         /* # of args, including action name. */
 		void (*function) (char **argv);   /* Function to execute action. */
 	};
-
 	/* Table of supported actions. */
 	static const struct action actions[] = {
 		{"run", 2, run_task},

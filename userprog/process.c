@@ -18,6 +18,7 @@
 #include "threads/mmu.h"
 #include "threads/vaddr.h"
 #include "intrinsic.h"
+#include "lib/user/syscall.h"
 #ifdef VM
 #include "vm/vm.h"
 #endif
@@ -70,6 +71,21 @@ initd (void *f_name) {
 		PANIC("Fail to launch initd\n");
 	NOT_REACHED ();
 }
+
+#include <debug.h>
+#include <console.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <string.h>
+#include "threads/init.h"
+#include "threads/interrupt.h"
+#include "devices/serial.h"
+
+/* Halts the OS, printing the source file name, line number, and
+   function name, plus a user-specific message. */
+
 
 /* Clones the current process as `name`. Returns the new process's thread id, or
  * TID_ERROR if the thread cannot be created. */
@@ -160,6 +176,7 @@ error:
 
 /* Switch the current execution context to the f_name.
  * Returns -1 on fail. */
+
 int
 process_exec (void *f_name) {
 	char *file_name = f_name;
@@ -172,7 +189,6 @@ process_exec (void *f_name) {
 	_if.ds = _if.es = _if.ss = SEL_UDSEG;
 	_if.cs = SEL_UCSEG;
 	_if.eflags = FLAG_IF | FLAG_MBS;
-
 	/* We first kill the current context */
 	process_cleanup ();
 
@@ -201,10 +217,10 @@ process_exec (void *f_name) {
  * does nothing. */
 int
 process_wait (tid_t child_tid UNUSED) {
-	/* XXX: Hint) The pintos exit if process_wait (initd), we recommend you
+	/* XXX: Hint) The pintos exit if process_wait (initd), {we recommend you
 	 * XXX:       to add infinite loop here before
 	 * XXX:       implementing the process_wait. */
-	return -1;
+	while (1);
 }
 
 /* Exit the process. This function is called by thread_exit (). */

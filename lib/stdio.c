@@ -78,6 +78,8 @@ printf (const char *format, ...) {
 
 	va_start (args, format);
 	retval = vprintf (format, args);
+	
+	
 	va_end (args);
 
 	return retval;

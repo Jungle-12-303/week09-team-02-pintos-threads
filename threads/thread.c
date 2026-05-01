@@ -334,14 +334,7 @@ bool comp_priority_function(const struct list_elem *a, const struct list_elem *b
 	return a_thread->priority > b_thread->priority;
 }
 
-bool comp_conv_priority_function(const struct list_elem *a, const struct list_elem *b, void *aux) {
-	ASSERT (a != NULL);
-	ASSERT (b != NULL);
 
-	struct thread *a_thread = list_entry(a, struct thread, elem);
-	struct thread *b_thread = list_entry(b, struct thread, elem);
-	return a_thread->priority > b_thread->priority;
-}
 
 /* Sets the current thread's priority to NEW_PRIORITY. */
 void
@@ -577,8 +570,11 @@ do_schedule(int status) {
 
 void preemption(struct thread *t, struct list list) {
 // 스레드가 실행중인 스레드보다 우선순위가 높다면 CPU를 가로채게 하는 것
-	if ((!list_empty(&ready_list)) && (t->priority > thread_current()->priority)) {
-		thread_yield();
+	if ((t->priority > thread_current()->priority)) {
+    if (intr_context ())
+        intr_yield_on_return ();
+    else
+        thread_yield ();
 	}
 }
 
