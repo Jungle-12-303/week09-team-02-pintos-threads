@@ -1,5 +1,7 @@
 # -*- makefile -*-
 
+SHELL = /bin/bash
+
 all:
 
 include Make.vars
@@ -7,14 +9,14 @@ include Make.vars
 DIRS = $(sort $(addprefix build/,$(KERNEL_SUBDIRS) $(TEST_SUBDIRS) lib/user))
 
 all grade check: $(DIRS) build/Makefile
-	cd build && $(MAKE) $@
+	source ../activate && cd build && $(MAKE) $@
 $(DIRS):
 	mkdir -p $@
 build/Makefile: ../Makefile.build
 	cp $< $@
 
 build/%: $(DIRS) build/Makefile
-	cd build && $(MAKE) $*
+	source ../activate && cd build && $(MAKE) $*
 
 clean:
 	rm -rf build

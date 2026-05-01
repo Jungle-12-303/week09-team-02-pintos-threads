@@ -10,6 +10,7 @@
 #include "threads/palloc.h"
 #include "threads/synch.h"
 #include "threads/vaddr.h"
+#include "kernel/list.h"
 #include "intrinsic.h"
 #ifdef USERPROG
 #include "userprog/process.h"
@@ -62,16 +63,6 @@ static void init_thread(struct thread *, const char *name, int priority);
 static void do_schedule(int status);
 static void schedule(void);
 static tid_t allocate_tid(void);
-
-static bool
-less_priority(const struct list_elem *a_,
-			  const struct list_elem *b_,
-			  void *aux UNUSED)
-{
-	const struct thread *a = list_entry(a_, struct thread, elem);
-	const struct thread *b = list_entry(b_, struct thread, elem);
-	return a->priority > b->priority;
-}
 
 /* Returns true if T appears to point to a valid thread. */
 #define is_thread(t) ((t) != NULL && (t)->magic == THREAD_MAGIC)
@@ -138,7 +129,7 @@ void thread_start(void)
 	intr_enable();
 
 	/* Wait for the idle thread to initialize idle_thread. */
-	sema_down(&idle_started);	
+	sema_down(&idle_started);
 }
 
 /* Called by the timer interrupt handler at each timer tick.
@@ -175,17 +166,11 @@ void thread_print_stats(void)
    for the new thread, or TID_ERROR if creation fails.
 
    If thread_start() has been called, then the new thread may be
-   scheduled before thread_create() returns
-   .  It could even exit
-   before thread_create() returns.  Contrar
-   iwise, the original
-   thread may run for any amount of time be
-   
-   fore the new thread is
-   scheduled.  Use a semaphore or some othe
-   r form of
-   synchronization if you need to ensure ord
-   ering.
+   scheduled before thread_create() returns.  It could even exit
+   before thread_create() returns.  Contrariwise, the original
+   thread may run for any amount of time before the new thread is
+   scheduled.  Use a semaphore or some other form of
+   synchronization if you need to ensure ordering.
 
    The code provided sets the new thread's `priority' member to
    PRIORITY, but no actual priority scheduling is implemented.
@@ -195,6 +180,7 @@ tid_t thread_create(const char *name, int priority,
 {
 	struct thread *t;
 	tid_t tid;
+
 	ASSERT(function != NULL);
 
 	/* Allocate thread. */
@@ -216,12 +202,10 @@ tid_t thread_create(const char *name, int priority,
 	t->tf.ss = SEL_KDSEG;
 	t->tf.cs = SEL_KCSEG;
 	t->tf.eflags = FLAG_IF;
-	/* Add to run queue. */
-	thread_unblock(t);
-	if (t -> priority > thread_current() -> priority){
-    	thread_yield ();
-	}
 
+	thread_unblock(t);
+	/* t = new thread, current thread 와 비교 */
+	thread_preemption();
 	return tid;
 }
 
@@ -255,7 +239,10 @@ void thread_unblock(struct thread *t)
 
 	old_level = intr_disable();
 	ASSERT(t->status == THREAD_BLOCKED);
-	list_insert_ordered(&ready_list, &t->elem, less_priority, NULL);
+	/* 우선순위 삽입 후 정렬 */
+	bool sorted_type = DESCEND;
+	list_insert_ordered(&ready_list, &t->elem, comp_priority, &sorted_type);
+
 	t->status = THREAD_READY;
 	intr_set_level(old_level);
 }
@@ -315,20 +302,20 @@ void thread_yield(void)
 {
 	struct thread *curr = thread_current();
 	enum intr_level old_level;
-	struct thread *front;
+
 	ASSERT(!intr_context());
 
 	old_level = intr_disable();
 	if (curr != idle_thread)
 	{
-		// list_empty(&ready_list)
-		// front = list_entry(list_front(&ready_list), struct thread, elem);
-		// if (front -> priority > thread_current() -> priority){
-		list_insert_ordered(&ready_list, &curr->elem, less_priority, NULL);
+		bool sorted_type = DESCEND;
+		list_insert_ordered(&ready_list, &curr->elem, comp_priority, &sorted_type);
 	}
+
 	do_schedule(THREAD_READY);
 	intr_set_level(old_level);
 }
+
 /* Sets the current thread's priority to NEW_PRIORITY. */
 void thread_set_priority(int new_priority)
 {
@@ -433,9 +420,6 @@ init_thread(struct thread *t, const char *name, int priority)
 	strlcpy(t->name, name, sizeof t->name);
 	t->tf.rsp = (uint64_t)t + PGSIZE - sizeof(void *);
 	t->priority = priority;
-	t->init_priority = priority;
-	t->wait_on_lock = NULL;
-	list_init(&t->locks);
 	t->magic = THREAD_MAGIC;
 }
 
@@ -559,7 +543,6 @@ do_schedule(int status)
 {
 	ASSERT(intr_get_level() == INTR_OFF);
 	ASSERT(thread_current()->status == THREAD_RUNNING);
-
 	while (!list_empty(&destruction_req))
 	{
 		struct thread *victim =
@@ -623,4 +606,33 @@ allocate_tid(void)
 	lock_release(&tid_lock);
 
 	return tid;
+}
+
+/* comp priority  ready list*/
+bool comp_priority(const struct list_elem *a, const struct list_elem *b, void *aux)
+{
+	const struct thread *ta = list_entry(a, struct thread, elem);
+	const struct thread *tb = list_entry(b, struct thread, elem);
+	bool is_ascend = *((bool *)aux);
+	if (is_ascend)
+		return ta->priority < tb->priority;
+	else
+		return ta->priority > tb->priority;
+}
+
+/* 현재 스레드와 ready list 가장 앞의 thread와 priority 비교 */
+void thread_preemption(void)
+{
+	if (list_empty(&ready_list))
+		return;
+	struct thread *front_th = list_entry(list_front(&ready_list), struct thread, elem);
+	if (thread_current()->priority < front_th->priority)
+	{
+		// 인터럽트 핸들러 안에서 thread_yield() 호출 하면 안됨
+		if (intr_context())
+			// 인터럽트 처리가 끝나고 돌아갈때 yield 해줘
+			intr_yield_on_return();
+		else
+			thread_yield();
+	}
 }

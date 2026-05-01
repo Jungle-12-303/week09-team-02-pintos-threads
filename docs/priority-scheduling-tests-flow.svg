@@ -1,0 +1,140 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="980" viewBox="0 0 1280 980" role="img" aria-labelledby="title desc">
+  <title id="title">Pintos Priority Scheduling Test Flow</title>
+  <desc id="desc">Diagram showing what tests 7 and 14 through 17 verify in Pintos priority scheduling.</desc>
+  <defs>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrow-emerald" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#059669"/>
+    </marker>
+    <marker id="arrow-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#d97706"/>
+    </marker>
+    <marker id="arrow-violet" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7c3aed"/>
+    </marker>
+    <marker id="arrow-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#e11d48"/>
+    </marker>
+    <style>
+      .bg { fill: #f8fafc; }
+      .title { font: 700 34px Arial, sans-serif; fill: #111827; }
+      .subtitle { font: 400 17px Arial, sans-serif; fill: #475569; }
+      .test-title { font: 700 20px Arial, sans-serif; fill: #111827; }
+      .test-sub { font: 700 15px "DejaVu Sans Mono", Consolas, monospace; fill: #334155; }
+      .small { font: 400 14px Arial, sans-serif; fill: #475569; }
+      .code { font: 700 14px "DejaVu Sans Mono", Consolas, monospace; fill: #1e293b; }
+      .label { font: 700 13px Arial, sans-serif; fill: #334155; }
+      .card { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; rx: 14; ry: 14; }
+      .node { stroke-width: 2.5; rx: 12; ry: 12; }
+      .blue { fill: #dbeafe; stroke: #60a5fa; }
+      .emerald { fill: #dcfce7; stroke: #34d399; }
+      .amber { fill: #fef3c7; stroke: #fbbf24; }
+      .violet { fill: #ede9fe; stroke: #a78bfa; }
+      .rose { fill: #ffe4e6; stroke: #fb7185; }
+      .line-blue { fill: none; stroke: #2563eb; stroke-width: 3; marker-end: url(#arrow-blue); }
+      .line-emerald { fill: none; stroke: #059669; stroke-width: 3; marker-end: url(#arrow-emerald); }
+      .line-amber { fill: none; stroke: #d97706; stroke-width: 3; marker-end: url(#arrow-amber); }
+      .line-violet { fill: none; stroke: #7c3aed; stroke-width: 3; marker-end: url(#arrow-violet); }
+      .line-rose { fill: none; stroke: #e11d48; stroke-width: 3; marker-end: url(#arrow-rose); }
+      .muted-line { fill: none; stroke: #94a3b8; stroke-width: 2; stroke-dasharray: 6 6; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1280" height="980"/>
+
+  <text class="title" x="54" y="58">Priority Scheduling Tests 7, 14-17</text>
+  <text class="subtitle" x="54" y="88">각 테스트가 검증하는 우선순위 스케줄링 흐름을 ready_list, semaphore waiters, condition waiters 관점으로 요약했습니다.</text>
+
+  <rect class="card" x="54" y="124" width="1172" height="136"/>
+  <text class="test-title" x="82" y="160">공통 규칙</text>
+  <rect class="node emerald" x="82" y="184" width="220" height="48"/>
+  <text class="code" x="112" y="214">ready_list 정렬</text>
+  <path class="line-emerald" d="M 302 208 H 410"/>
+  <rect class="node blue" x="410" y="184" width="240" height="48"/>
+  <text class="code" x="438" y="214">가장 높은 priority 선택</text>
+  <path class="line-blue" d="M 650 208 H 758"/>
+  <rect class="node amber" x="758" y="184" width="210" height="48"/>
+  <text class="code" x="792" y="214">필요하면 선점</text>
+  <path class="line-amber" d="M 968 208 H 1076"/>
+  <rect class="node violet" x="1076" y="184" width="118" height="48"/>
+  <text class="code" x="1104" y="214">PASS</text>
+  <text class="small" x="82" y="246">동일 priority는 기존 순서가 유지되어야 하고, block된 스레드가 깨어날 때도 priority 순서가 깨지면 안 됩니다.</text>
+
+  <rect class="card" x="54" y="292" width="560" height="156"/>
+  <text class="test-title" x="82" y="328">7) priority-change</text>
+  <text class="test-sub" x="82" y="352">thread_set_priority()</text>
+  <rect class="node blue" x="82" y="378" width="128" height="44"/>
+  <text class="label" x="113" y="405">현재 실행</text>
+  <path class="line-blue" d="M 210 400 H 274"/>
+  <rect class="node amber" x="274" y="378" width="132" height="44"/>
+  <text class="label" x="303" y="405">priority 하락</text>
+  <path class="line-amber" d="M 406 400 H 470"/>
+  <rect class="node emerald" x="470" y="378" width="110" height="44"/>
+  <text class="label" x="490" y="405">yield</text>
+  <text class="small" x="82" y="434">현재 스레드의 우선순위가 낮아지면 ready_list 앞의 더 높은 priority 스레드에게 CPU를 넘겨야 합니다.</text>
+
+  <rect class="card" x="666" y="292" width="560" height="156"/>
+  <text class="test-title" x="694" y="328">14) priority-fifo</text>
+  <text class="test-sub" x="694" y="352">same priority ordering</text>
+  <rect class="node emerald" x="694" y="378" width="112" height="44"/>
+  <text class="label" x="730" y="405">A</text>
+  <path class="line-emerald" d="M 806 400 H 850"/>
+  <rect class="node emerald" x="850" y="378" width="112" height="44"/>
+  <text class="label" x="886" y="405">B</text>
+  <path class="line-emerald" d="M 962 400 H 1006"/>
+  <rect class="node emerald" x="1006" y="378" width="112" height="44"/>
+  <text class="label" x="1042" y="405">C</text>
+  <text class="small" x="694" y="434">같은 priority의 스레드는 먼저 ready 상태가 된 순서대로 실행되어야 합니다.</text>
+
+  <rect class="card" x="54" y="480" width="560" height="156"/>
+  <text class="test-title" x="82" y="516">15) priority-preempt</text>
+  <text class="test-sub" x="82" y="540">thread_create() preemption</text>
+  <rect class="node amber" x="82" y="566" width="148" height="44"/>
+  <text class="label" x="112" y="593">낮은 priority</text>
+  <path class="line-rose" d="M 230 588 H 304"/>
+  <rect class="node rose" x="304" y="566" width="160" height="44"/>
+  <text class="label" x="333" y="593">높은 priority 생성</text>
+  <path class="line-rose" d="M 464 588 H 534"/>
+  <rect class="node blue" x="534" y="566" width="46" height="44"/>
+  <text class="label" x="544" y="593">실행</text>
+  <text class="small" x="82" y="622">새 스레드가 현재 스레드보다 우선순위가 높으면 즉시 선점되어야 합니다.</text>
+
+  <rect class="card" x="666" y="480" width="560" height="156"/>
+  <text class="test-title" x="694" y="516">16) priority-sema</text>
+  <text class="test-sub" x="694" y="540">sema.waiters priority wake-up</text>
+  <rect class="node violet" x="694" y="566" width="150" height="44"/>
+  <text class="label" x="726" y="593">sema_down()</text>
+  <path class="line-violet" d="M 844 588 H 914"/>
+  <rect class="node amber" x="914" y="566" width="144" height="44"/>
+  <text class="label" x="946" y="593">waiters 정렬</text>
+  <path class="line-amber" d="M 1058 588 H 1116"/>
+  <rect class="node emerald" x="1116" y="566" width="78" height="44"/>
+  <text class="label" x="1132" y="593">최고 먼저</text>
+  <text class="small" x="694" y="622">sema_up()은 기다리는 스레드 중 가장 높은 priority 스레드를 먼저 깨워야 합니다.</text>
+
+  <rect class="card" x="54" y="668" width="1172" height="190"/>
+  <text class="test-title" x="82" y="704">17) priority-condvar</text>
+  <text class="test-sub" x="82" y="728">condition.waiters -> semaphore_elem -> personal semaphore</text>
+  <rect class="node blue" x="82" y="760" width="174" height="52"/>
+  <text class="label" x="120" y="782">cond_wait()</text>
+  <text class="small" x="104" y="802">priority 저장</text>
+  <path class="line-blue" d="M 256 786 H 352"/>
+  <rect class="node violet" x="352" y="760" width="230" height="52"/>
+  <text class="label" x="392" y="782">condition.waiters</text>
+  <text class="small" x="388" y="802">semaphore_elem 정렬</text>
+  <path class="line-violet" d="M 582 786 H 678"/>
+  <rect class="node amber" x="678" y="760" width="198" height="52"/>
+  <text class="label" x="720" y="782">cond_signal()</text>
+  <text class="small" x="708" y="802">맨 앞 waiter 선택</text>
+  <path class="line-amber" d="M 876 786 H 972"/>
+  <rect class="node emerald" x="972" y="760" width="222" height="52"/>
+  <text class="label" x="1016" y="782">personal sema_up()</text>
+  <text class="small" x="1002" y="802">최고 priority 스레드 깨움</text>
+  <text class="small" x="82" y="842">condition.waiters에는 thread.elem이 아니라 semaphore_elem.elem이 들어가므로, signal 시 semaphore_elem 안의 개인용 semaphore를 통해 깨웁니다.</text>
+
+  <rect class="card" x="54" y="890" width="1172" height="56"/>
+  <text class="code" x="82" y="924">검증 명령: printf '7 14-17\n' | threads/select_test.sh -q</text>
+  <text class="small" x="686" y="924">priority-change, priority-fifo, priority-preempt, priority-sema, priority-condvar</text>
+</svg>

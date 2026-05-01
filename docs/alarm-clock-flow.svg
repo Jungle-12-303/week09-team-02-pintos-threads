@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="720" viewBox="0 0 1120 720" role="img" aria-labelledby="title desc">
+  <title id="title">Pintos Alarm Clock Flow</title>
+  <desc id="desc">timer_sleep puts the current thread into sleeping_list until timer_interrupt moves it back to ready_list with thread_unblock.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#233044"/>
+    </marker>
+    <style>
+      .bg { fill: #f7f9fc; }
+      .title { font: 700 34px Arial, sans-serif; fill: #162033; }
+      .subtitle { font: 400 17px Arial, sans-serif; fill: #4b5a70; }
+      .label { font: 700 18px Arial, sans-serif; fill: #162033; }
+      .small { font: 400 15px Arial, sans-serif; fill: #415066; }
+      .code { font: 700 16px "DejaVu Sans Mono", Consolas, monospace; fill: #1d293d; }
+      .box { stroke: #c8d2e1; stroke-width: 2; rx: 12; ry: 12; }
+      .blue { fill: #dbeafe; }
+      .green { fill: #dcfce7; }
+      .amber { fill: #fef3c7; }
+      .rose { fill: #ffe4e6; }
+      .violet { fill: #ede9fe; }
+      .slate { fill: #e2e8f0; }
+      .line { fill: none; stroke: #233044; stroke-width: 3; marker-end: url(#arrow); }
+      .softline { fill: none; stroke: #6b7a90; stroke-width: 2.5; stroke-dasharray: 8 6; marker-end: url(#arrow); }
+      .tick { fill: #ffffff; stroke: #c8d2e1; stroke-width: 2; rx: 10; ry: 10; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1120" height="720"/>
+
+  <text class="title" x="56" y="58">Pintos Alarm Clock: thread가 잠들고 다시 깨어나는 흐름</text>
+  <text class="subtitle" x="56" y="88">busy waiting 대신 sleeping_list에 재워 두고, timer interrupt가 깨울 시간이 된 thread를 ready_list로 보냅니다.</text>
+
+  <rect class="box blue" x="56" y="140" width="240" height="110"/>
+  <text class="label" x="82" y="180">1. 실행 중인 thread</text>
+  <text class="code" x="82" y="210">THREAD_RUNNING</text>
+  <text class="small" x="82" y="232">CPU를 사용하다가 sleep 요청</text>
+
+  <rect class="box green" x="392" y="128" width="286" height="134"/>
+  <text class="label" x="420" y="168">2. timer_sleep(ticks)</text>
+  <text class="small" x="420" y="198">현재 tick을 읽고</text>
+  <text class="code" x="420" y="224">wakeup_tick = now + ticks</text>
+  <text class="small" x="420" y="246">로 깨어날 시간을 저장</text>
+
+  <rect class="box amber" x="784" y="122" width="280" height="148"/>
+  <text class="label" x="812" y="162">3. sleeping_list 삽입</text>
+  <text class="small" x="812" y="192">wakeup_less() 기준으로 정렬</text>
+  <text class="code" x="812" y="222">빠른 wakeup_tick이 앞</text>
+  <text class="small" x="812" y="246">그 후 thread_block()</text>
+
+  <path class="line" d="M 296 195 H 382"/>
+  <path class="line" d="M 678 195 H 774"/>
+
+  <rect class="tick" x="120" y="342" width="180" height="76"/>
+  <text class="label" x="146" y="374">timer tick</text>
+  <text class="small" x="146" y="398">하드웨어 인터럽트</text>
+
+  <rect class="box rose" x="396" y="318" width="284" height="124"/>
+  <text class="label" x="424" y="356">4. timer_interrupt()</text>
+  <text class="code" x="424" y="386">ticks++</text>
+  <text class="small" x="424" y="414">sleeping_list 앞에서부터 검사</text>
+
+  <rect class="box violet" x="786" y="318" width="278" height="124"/>
+  <text class="label" x="812" y="356">5. 깨울 시간인가?</text>
+  <text class="code" x="812" y="386">wakeup_tick &lt;= ticks</text>
+  <text class="small" x="812" y="414">아니면 뒤 thread도 아직 잠</text>
+
+  <path class="line" d="M 300 380 H 386"/>
+  <path class="line" d="M 680 380 H 776"/>
+  <path class="softline" d="M 926 270 V 306"/>
+
+  <rect class="box green" x="610" y="532" width="250" height="112"/>
+  <text class="label" x="638" y="570">6. thread_unblock()</text>
+  <text class="small" x="638" y="600">sleeping_list에서 제거</text>
+  <text class="code" x="638" y="626">THREAD_READY</text>
+
+  <rect class="box slate" x="250" y="532" width="240" height="112"/>
+  <text class="label" x="278" y="570">7. ready_list</text>
+  <text class="small" x="278" y="600">스케줄러가 고를 수 있는</text>
+  <text class="small" x="278" y="624">실행 대기열로 이동</text>
+
+  <path class="line" d="M 924 442 C 924 512 872 588 870 588"/>
+  <path class="line" d="M 610 588 H 500"/>
+  <path class="softline" d="M 250 588 C 130 588 88 440 150 420"/>
+
+  <rect x="56" y="666" width="1008" height="2" fill="#c8d2e1"/>
+  <text class="small" x="56" y="696">핵심: sleep 중인 thread는 CPU를 쓰지 않습니다. timer interrupt가 깨울 시간이 된 thread만 ready_list로 돌려보냅니다.</text>
+</svg>
