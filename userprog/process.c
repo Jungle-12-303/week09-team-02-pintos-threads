@@ -22,10 +22,16 @@
 #include "vm/vm.h"
 #endif
 
+#define MAX_ARGS 128
+
 static void process_cleanup(void);
 static bool load(const char *file_name, struct intr_frame *if_);
 static void initd(void *f_name);
 static void __do_fork(void *);
+// commandline(file_name) 토큰화
+static int parse_args(char *cmd_line, char **argv);
+// 토큰화한 commandline userstack에 넣기
+static void argument_stack(char *argv[], int argc, struct intr_frame *_if);
 
 /* General process initializer for initd and other process. */
 static void
@@ -42,6 +48,9 @@ process_init(void)
 tid_t process_create_initd(const char *file_name)
 {
 	char *fn_copy;
+	char prog_name[16];
+	char *save_ptr;
+
 	tid_t tid;
 
 	/* Make a copy of FILE_NAME.
@@ -51,8 +60,14 @@ tid_t process_create_initd(const char *file_name)
 		return TID_ERROR;
 	strlcpy(fn_copy, file_name, PGSIZE);
 
+	// cmd_line 첫번째인자만 뽑아내기
+	// args-single onearg
+	// prog_name = 'args-single'
+	strlcpy(prog_name, file_name, sizeof prog_name);
+	strtok_r(prog_name, " ", &save_ptr);
+
 	/* Create a new thread to execute FILE_NAME. */
-	tid = thread_create(file_name, PRI_DEFAULT, initd, fn_copy);
+	tid = thread_create(prog_name, PRI_DEFAULT, initd, fn_copy);
 	if (tid == TID_ERROR)
 		palloc_free_page(fn_copy);
 	return tid;
@@ -164,7 +179,8 @@ error:
 }
 
 /* Switch the current execution context to the f_name.
- * Returns -1 on fail. */
+ * Returns -1 on fail.
+ 현재 thread의 실행 내용을 새 유저 프로그램으로 바꿔서 실행 준비를 하는 함수입니다.*/
 int process_exec(void *f_name)
 {
 	char *file_name = f_name;
@@ -172,16 +188,19 @@ int process_exec(void *f_name)
 
 	/* We cannot use the intr_frame in the thread structure.
 	 * This is because when current thread rescheduled,
-	 * it stores the execution information to the member. */
+	 * it stores the execution information to the member.
+	 * 새 유저 프로그램이 시작할 때 쓸 CPU 상태를 준비 */
 	struct intr_frame _if;
 	_if.ds = _if.es = _if.ss = SEL_UDSEG;
 	_if.cs = SEL_UCSEG;
 	_if.eflags = FLAG_IF | FLAG_MBS;
 
-	/* We first kill the current context */
+	/* We first kill the current context
+	현재 프로세스의 기존 주소 공간을 정리*/
 	process_cleanup();
 
-	/* And then load the binary */
+	/* And then load the binary
+	실행 파일을 읽어서 메모리에 올림*/
 	success = load(file_name, &_if);
 
 	/* If load failed, quit. */
@@ -209,8 +228,8 @@ int process_wait(tid_t child_tid UNUSED)
 	 * XXX:       to add infinite loop here before
 	 * XXX:       implementing the process_wait. */
 	// 임시
-	while (1)
-		;
+	timer_sleep(100);
+	return 0;
 }
 
 /* Exit the process. This function is called by thread_exit (). */
@@ -221,7 +240,7 @@ void process_exit(void)
 	 * TODO: Implement process termination message (see
 	 * TODO: project2/process_termination.html).
 	 * TODO: We recommend you to implement process resource cleanup here. */
-
+	printf("%s: exit(%d)\n", thread_name(), curr->exit_status);
 	process_cleanup();
 }
 
@@ -255,7 +274,9 @@ process_cleanup(void)
 }
 
 /* Sets up the CPU for running user code in the nest thread.
- * This function is called on every context switch. */
+ * This function is called on every context switch.
+ 현재 실행할 thread/process의 주소 공간과 커널 스택 정보를 CPU에 적용하는 함수입니다.
+ */
 void process_activate(struct thread *next)
 {
 	/* Activate thread's page tables. */
@@ -292,13 +313,13 @@ struct ELF64_hdr
 	uint16_t e_type;
 	uint16_t e_machine;
 	uint32_t e_version;
-	uint64_t e_entry;
-	uint64_t e_phoff;
+	uint64_t e_entry; // 프로그램 시작 주소
+	uint64_t e_phoff; // program header table 위치
 	uint64_t e_shoff;
 	uint32_t e_flags;
 	uint16_t e_ehsize;
 	uint16_t e_phentsize;
-	uint16_t e_phnum;
+	uint16_t e_phnum; // program header 개수
 	uint16_t e_shentsize;
 	uint16_t e_shnum;
 	uint16_t e_shstrndx;
@@ -328,29 +349,51 @@ static bool load_segment(struct file *file, off_t ofs, uint8_t *upage,
 
 /* Loads an ELF executable from FILE_NAME into the current thread.
  * Stores the executable's entry point into *RIP
+   RIP = CPU가 다음에 실행할 코드 주소
+
  * and its initial stack pointer into *RSP.
  * Returns true if successful, false otherwise. */
 static bool
 load(const char *file_name, struct intr_frame *if_)
 {
 	struct thread *t = thread_current();
-	struct ELF ehdr;
+	struct ELF ehdr; // 실행파일의 ELF 헤더를 읽어 담기 위한 변수
 	struct file *file = NULL;
 	off_t file_ofs;
 	bool success = false;
 	int i;
 
+	// command line tokenizer
+
+	char *argv[MAX_ARGS];
+	int argc = parse_args(file_name, argv);
 	/* Allocate and activate page directory. */
+	//
+	/*
+	현재 thread, 즉 지금 실행될 유저 프로세스의 새 페이지 테이블을 만듭니다.
+	x86-64에서는 최상위 페이지 테이블을 PML4라고 부릅니다.
+	Pintos에서는 각 유저 프로세스마다 자기 주소 공간을 가져야 하므로,
+	프로세스마다 pml4가 필요합니다.
+
+	process A -> A용 pml4
+	process B -> B용 pml4
+	process C -> C용 pml4
+
+	그래야 같은 가상 주소라도 프로세스마다 다른 물리 메모리를 가리킬 수 있습니다.
+	A의 0x400000 -> A 코드
+	B의 0x400000 -> B 코드
+
+	*/
 	t->pml4 = pml4_create();
 	if (t->pml4 == NULL)
 		goto done;
 	process_activate(thread_current());
 
 	/* Open executable file. */
-	file = filesys_open(file_name);
+	file = filesys_open(argv[0]);
 	if (file == NULL)
 	{
-		printf("load: %s: open failed\n", file_name);
+		printf("load: %s: open failed\n", argv[0]);
 		goto done;
 	}
 
@@ -362,7 +405,38 @@ load(const char *file_name, struct intr_frame *if_)
 		goto done;
 	}
 
-	/* Read program headers. */
+	/* Read program headers.
+	ELF 파일 안의 “어느 부분을 메모리 어디에 올릴지” 설명서를 읽고,
+	PT_LOAD segment만 골라 유저 주소 공간에 매핑한다.
+
+	[ELF 파일 구조]
+	ELF Header
+	Program Header Table
+	실제 코드/데이터 내용
+
+	Segment : 실행 파일 ELF 안에서 의미 단위로 나뉜 큰 영역
+	struct phdr 하나가 segment 하나인가?
+
+	Page : 운영체제와 CPU가 메모리를 관리하는 고정 크기 단위입니다.
+		  4KB = 4096 bytes
+
+	Program Header Table 읽기
+	|
+	v
+	각 phdr 확인
+	|
+	├─ 필요 없는 segment면 무시
+	├─ Pintos가 지원 안 하는 segment면 실패
+	└─ PT_LOAD면
+		|
+		├─ validate_segment()
+		├─ writable 계산
+		├─ 파일 offset / 메모리 주소 page-align
+		├─ read_bytes / zero_bytes 계산
+		└─ load_segment()로 실제 메모리에 적재
+
+
+*/
 	file_ofs = ehdr.e_phoff;
 	for (i = 0; i < ehdr.e_phnum; i++)
 	{
@@ -428,10 +502,10 @@ load(const char *file_name, struct intr_frame *if_)
 	if_->rip = ehdr.e_entry;
 
 	/* TODO: Your code goes here.
-	 * TODO: Implement argument passing (see project2/argument_passing.html). */
-
+	 * TODO: Implement argument passing (see project2/argument_passing.html).
+	 rsp가 가리키는 곳에 8파이트씩 args의 값을 복사해넣기??? */
+	argument_stack(argv, argc, if_);
 	success = true;
-
 done:
 	/* We arrive here whether the load is successful or not. */
 	file_close(file);
@@ -558,9 +632,30 @@ setup_stack(struct intr_frame *if_)
 	uint8_t *kpage;
 	bool success = false;
 
+	// 유저 프로그램용 페이지를 하나 할당
+	// PAL_USER = user pool에서 페이지를 가져옴
+	// PAL_ZERO = 페이지 내용을 전부 0으로 초기화
+
 	kpage = palloc_get_page(PAL_USER | PAL_ZERO);
 	if (kpage != NULL)
 	{
+		// 방금 할당한 kpage를 유저 가상 주소에 연결합니다.
+		// ((uint8_t *)USER_STACK) - PGSIZE 왜 빼지?
+		/*
+
+		높은 주소
+
+		USER_STACK
+		+-------------------+
+		|                   |
+		|   user stack page |
+		|                   |
+		+-------------------+
+		USER_STACK - PGSIZE
+
+		낮은 주소
+
+		*/
 		success = install_page(((uint8_t *)USER_STACK) - PGSIZE, kpage, true);
 		if (success)
 			if_->rsp = USER_STACK;
@@ -574,11 +669,16 @@ setup_stack(struct intr_frame *if_)
  * virtual address KPAGE to the page table.
  * If WRITABLE is true, the user process may modify the page;
  * otherwise, it is read-only.
- * UPAGE must not already be mapped.
- * KPAGE should probably be a page obtained from the user pool
+ * UPAGE(user page) must not already be mapped.
+ * KPAGE(kernel page) should probably be a page obtained from the user pool
  * with palloc_get_page().
  * Returns true on success, false if UPAGE is already mapped or
- * if memory allocation fails. */
+ * if memory allocation fails.
+ * 유저 가상 주소 upage를 실제 메모리 페이지 kpage에 연결해주는 함수입니다.
+
+
+
+ */
 static bool
 install_page(void *upage, void *kpage, bool writable)
 {
@@ -588,6 +688,64 @@ install_page(void *upage, void *kpage, bool writable)
 	 * address, then map our page there. */
 	return (pml4_get_page(t->pml4, upage) == NULL && pml4_set_page(t->pml4, upage, kpage, writable));
 }
+// cmd_line =  "args-single onearg"
+int parse_args(char *cmd_line, char **argv)
+{
+	char *token, *save_ptr;
+	int argc = 0;
+
+	for (token = strtok_r(cmd_line, " ", &save_ptr); token != NULL; token = strtok_r(NULL, " ", &save_ptr))
+	{
+		argv[argc++] = token;
+	}
+	argv[argc] = NULL;
+
+	return argc;
+}
+
+void argument_stack(char *argv[], int argc, struct intr_frame *_if)
+{
+	uint64_t rsp_arr[argc]; // 각 인자 문자열의 시작 주소를 저장할 배열
+
+	// 문자열을 스택에 역순으로 복사
+	for (int i = argc - 1; i >= 0; i--)
+	{
+		// size_t 메모리 크기나 길이를 표현할때 쓰는 정수 타입
+		size_t len = strlen(argv[i]) + 1;		// 문자열 길이 + 널 문자 포함
+		_if->rsp -= len;						// 스택 아래로 공간 확보
+		rsp_arr[i] = _if->rsp;					// 해당 문자열이 위치한 주소 저장
+		memcpy((void *)_if->rsp, argv[i], len); // 스택에 문자열 복사
+	}
+	
+	/*
+	x86-64 ABI라서:
+	x86-64에서 함수 호출 규약이 스택 정렬을 요구하기 때문이다
+	함수 호출 시 스택 정렬을 16바이트 기준으로 맞춤
+	16바이트 정렬 맞추기 (rsp를 16의 배수로 내림 정렬)
+	*/
+	_if->rsp = _if->rsp & ~0xF; // 하위 4비트 0으로 마스킹 → 16의 배수
+
+	// NULL sentinel push (argv[argc] = NULL)
+	// 64비트라서 포인터 크기가 8바이트이다
+	_if->rsp -= 8;								 // 포인터 크기만큼 스택 아래로
+	memset((void *)_if->rsp, 0, sizeof(char *)); // 0으로 채움 (NULL)
+
+	// argv[i] 포인터들을 역순으로 push
+	for (int i = argc - 1; i >= 0; i--)
+	{
+		_if->rsp -= 8;											// 8바이트 공간 확보
+		memcpy((void *)_if->rsp, &rsp_arr[i], sizeof(char **)); // 각 문자열의 주소를 복사
+	}
+
+	// fake return address
+	_if->rsp -= 8;
+	memset((void *)_if->rsp, 0, sizeof(void *)); // 가짜 리턴 주소 = 0
+
+	// 사용자 프로그램 시작 시 인자 전달을 위한 레지스터 설정
+	_if->R.rdi = argc;		   // 첫 번째 인자: argc
+	_if->R.rsi = _if->rsp + 8; // 두 번째 인자: argv (가짜 리턴 주소 다음부터가 argv[0] 배열)
+}
+
 #else
 /* From here, codes will be used after project 3.
  * If you want to implement the function for only project 2, implement it on the
