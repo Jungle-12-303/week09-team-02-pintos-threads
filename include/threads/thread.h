@@ -99,6 +99,7 @@ struct thread
 	int64_t wakeup_tick;	   /* alarm clock*/
 	/* Shared between thread.c and synch.c. */
 	struct list_elem elem; /* List element. */
+	int exit_status;
 
 #ifdef USERPROG
 	/* Owned by userprog/process.c. */

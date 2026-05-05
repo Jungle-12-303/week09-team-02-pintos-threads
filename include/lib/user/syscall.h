@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <debug.h>
 #include <stddef.h>
+#include "threads/thread.h"
 
 /* Process identifier. */
 typedef int pid_t;
@@ -49,6 +50,7 @@ bool readdir (int fd, char name[READDIR_MAX_LEN + 1]);
 bool isdir (int fd);
 int inumber (int fd);
 int symlink (const char* target, const char* linkpath);
+void sys_exit(int status);
 
 static inline void* get_phys_addr (void *user_addr) {
 	void* pa;
@@ -77,5 +79,6 @@ get_fs_disk_write_cnt (void) {
 	asm volatile ("\t movq %%rax, %0": "=r" (write_cnt));
 	return write_cnt;
 }
+
 
 #endif /* lib/user/syscall.h */

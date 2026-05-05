@@ -76,7 +76,6 @@ main (void) {
 	/* Break command line into arguments and parse options. */
 	argv = read_command_line ();
 	argv = parse_options (argv);
-
 	/* Initialize ourselves as a thread so we can use locks,
 	   then enable console locking. */
 	thread_init ();
@@ -182,7 +181,7 @@ read_command_line (void) {
 	for (i = 0; i < argc; i++) {
 		if (p >= end)
 			PANIC ("command line arguments overflow");
-
+		printf("argv[%d] : %s\n", i, p);
 		argv[i] = p;
 		p += strnlen (p, end - p) + 1;
 	}
@@ -208,7 +207,6 @@ parse_options (char **argv) {
 		char *save_ptr;
 		char *name = strtok_r (*argv, "=", &save_ptr);
 		char *value = strtok_r (NULL, "", &save_ptr);
-
 		if (!strcmp (name, "-h"))
 			usage ();
 		else if (!strcmp (name, "-q"))
@@ -237,6 +235,7 @@ parse_options (char **argv) {
 /* Runs the task specified in ARGV[1]. */
 static void
 run_task (char **argv) {
+	printf("argv : %s\n",argv[1]);
 	const char *task = argv[1];
 
 	printf ("Executing '%s':\n", task);
@@ -262,7 +261,7 @@ run_actions (char **argv) {
 		int argc;                         /* # of args, including action name. */
 		void (*function) (char **argv);   /* Function to execute action. */
 	};
-
+	printf("argv_everyone");
 	/* Table of supported actions. */
 	static const struct action actions[] = {
 		{"run", 2, run_task},
@@ -293,6 +292,7 @@ run_actions (char **argv) {
 				PANIC ("action `%s' requires %d argument(s)", *argv, a->argc - 1);
 
 		/* Invoke action and advance. */
+	
 		a->function (argv);
 		argv += a->argc;
 	}

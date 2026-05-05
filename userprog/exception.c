@@ -158,3 +158,31 @@ page_fault (struct intr_frame *f) {
 	kill (f);
 }
 
+
+/* 사용자 가상 주소 UADDR에서 1바이트를 읽는다.
+ * UADDR은 반드시 KERN_BASE 아래여야 한다.
+ * 성공하면 바이트 값을 반환하고, 세그멘테이션 fault가 발생하면 -1을 반환한다. */
+static int64_t
+get_user (const uint8_t *uaddr) {
+    int64_t result;
+    __asm __volatile (
+    "movabsq $done_get, %0\n"
+    "movzbq %1, %0\n"
+    "done_get:\n"
+    : "=&a" (result) : "m" (*uaddr));
+    return result;
+}
+
+/* BYTE를 사용자 주소 UDST에 쓴다.
+ * UDST는 반드시 KERN_BASE 아래여야 한다.
+ * 성공하면 true를 반환하고, 세그멘테이션 fault가 발생하면 false를 반환한다. */
+static bool
+put_user (uint8_t *udst, uint8_t byte) {
+    int64_t error_code;
+    __asm __volatile (
+    "movabsq $done_put, %0\n"
+    "movb %b2, %1\n"
+    "done_put:\n"
+    : "=&a" (error_code), "=m" (*udst) : "q" (byte));
+    return error_code != -1;
+}

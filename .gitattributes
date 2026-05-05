@@ -1,1 +1,4 @@
 * text=auto eol=lf
+
+*.c filter=jungle-local
+*.h filter=jungle-local

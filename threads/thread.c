@@ -202,6 +202,7 @@ tid_t thread_create(const char *name, int priority,
 	t->tf.ss = SEL_KDSEG;
 	t->tf.cs = SEL_KCSEG;
 	t->tf.eflags = FLAG_IF;
+	t->exit_status=0;
 
 	thread_unblock(t);
 	/* t = new thread, current thread 와 비교 */

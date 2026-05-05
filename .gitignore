@@ -30,3 +30,7 @@ core
 
 # macOS
 .DS_Store
+
+# Annotation (auto-generated)
+.jungle-kit/
+.gitattributes
