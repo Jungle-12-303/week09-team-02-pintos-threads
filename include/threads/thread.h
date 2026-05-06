@@ -5,6 +5,9 @@
 #include <list.h>
 #include <stdint.h>
 #include "threads/interrupt.h"
+#ifdef USERPROG
+#include "threads/synch.h"
+#endif
 #ifdef VM
 #include "vm/vm.h"
 #endif
@@ -31,6 +34,29 @@ typedef int tid_t;
 /* ready list waiters sorting */
 #define ASCEND true
 #define DESCEND false
+
+#ifdef USERPROG
+struct file;
+
+struct child_info
+{
+	tid_t tid;
+	int exit_status;
+	bool waited;
+	bool exited;
+	bool fork_success;
+	struct semaphore wait_sema;
+	struct semaphore fork_sema;
+	struct list_elem elem;
+};
+
+struct fd_entry
+{
+	int fd;
+	struct file *file;
+	struct list_elem elem;
+};
+#endif
 
 /* A kernel thread or user process.
  *
@@ -99,11 +125,17 @@ struct thread
 	int64_t wakeup_tick;	   /* alarm clock*/
 	/* Shared between thread.c and synch.c. */
 	struct list_elem elem; /* List element. */
-	int exit_status;
 
 #ifdef USERPROG
 	/* Owned by userprog/process.c. */
 	uint64_t *pml4; /* Page map level 4 */
+	struct thread *parent;
+	struct list children;
+	struct child_info *child_info;
+	int exit_status;
+	struct list fd_list;
+	int next_fd;
+	struct file *exec_file;
 #endif
 #ifdef VM
 	/* Table for whole virtual memory owned by thread. */
