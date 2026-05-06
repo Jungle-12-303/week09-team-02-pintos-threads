@@ -202,7 +202,6 @@ tid_t thread_create(const char *name, int priority,
 	t->tf.ss = SEL_KDSEG;
 	t->tf.cs = SEL_KCSEG;
 	t->tf.eflags = FLAG_IF;
-	t->exit_status=0;
 
 	thread_unblock(t);
 	/* t = new thread, current thread 와 비교 */
@@ -421,6 +420,15 @@ init_thread(struct thread *t, const char *name, int priority)
 	strlcpy(t->name, name, sizeof t->name);
 	t->tf.rsp = (uint64_t)t + PGSIZE - sizeof(void *);
 	t->priority = priority;
+#ifdef USERPROG
+	t->parent = NULL;
+	list_init(&t->children);
+	t->child_info = NULL;
+	t->exit_status = 0;
+	list_init(&t->fd_list);
+	t->next_fd = 2;
+	t->exec_file = NULL;
+#endif
 	t->magic = THREAD_MAGIC;
 }
 
