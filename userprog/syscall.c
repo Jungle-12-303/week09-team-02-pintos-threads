@@ -130,6 +130,7 @@ sys_write (int argsys, int fd, char *buffer, size_t size) {
 	}
 }
 
+/* SYS_CREATE: 유저가 넘긴 파일 이름과 초기 크기로 새 파일을 만든다. */
 static bool
 sys_create (const char *file, unsigned initial_size) {
 	validate_ptr (file, 1);
@@ -146,6 +147,7 @@ sys_create (const char *file, unsigned initial_size) {
 	return success;
 }
 
+/* SYS_REMOVE: 유저가 넘긴 파일 이름에 해당하는 파일을 삭제한다. */
 static bool
 sys_remove (const char *file) {
 	validate_ptr (file, 1);
@@ -157,6 +159,7 @@ sys_remove (const char *file) {
 	return success;
 }
 
+/* SYS_OPEN: 파일을 열고 현재 프로세스의 fd table에 등록한 뒤 fd 번호를 반환한다. */
 static int
 sys_open (const char *file_name) {
 	validate_ptr (file_name, 1);
@@ -184,6 +187,7 @@ sys_open (const char *file_name) {
 	return fd;
 }
 
+/* SYS_FILESIZE: fd가 가리키는 열린 파일의 전체 크기를 반환한다. */
 static int
 sys_filesize(int fd)
 {
@@ -200,6 +204,7 @@ sys_filesize(int fd)
 	return size;
 }
 
+/* SYS_READ: stdin 또는 열린 파일에서 데이터를 읽어 유저 버퍼에 채운다. */
 static int
 sys_read(int fd, void *buffer, unsigned size)
 {
@@ -235,6 +240,7 @@ sys_read(int fd, void *buffer, unsigned size)
 	return bytes_read;
 }
 
+/* SYS_WRITE: stdout 또는 열린 파일에 유저 버퍼의 데이터를 쓴다. */
 static int
 sys_write(int fd, const void *buffer, unsigned size)
 {
@@ -269,6 +275,7 @@ sys_write(int fd, const void *buffer, unsigned size)
 	return bytes_write;
 }
 
+/* SYS_SEEK: fd가 가리키는 파일의 현재 읽기/쓰기 위치를 지정한 위치로 옮긴다. */
 static void
 sys_seek(int fd, unsigned position)
 {
@@ -283,6 +290,7 @@ sys_seek(int fd, unsigned position)
 	lock_release(&filesys_lock);
 }
 
+/* SYS_TELL: fd가 가리키는 파일의 현재 읽기/쓰기 위치를 반환한다. */
 static unsigned
 sys_tell(int fd)
 {
@@ -299,6 +307,7 @@ sys_tell(int fd)
 	return pos;
 }
 
+/* SYS_CLOSE: fd table에서 fd를 제거하고 연결된 파일을 닫는다. */
 static void
 sys_close(int fd)
 {
