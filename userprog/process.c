@@ -28,8 +28,7 @@ static void initd(void *f_name);
 static void __do_fork(void *);
 
 /* General process initializer for initd and other process. */
-static void
-process_init(void)
+static void process_init(void)
 {
 	struct thread *current = thread_current();
 }
